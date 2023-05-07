@@ -1,11 +1,12 @@
 ## Python code: ingest_data.py
 #solar_pipeline
 
-First script `data_ingest.py` is submitted to Spark / EMR. It reads data from Kafka topic for 24 hours of the previous day into PySpark. For this, we use the `startingTimestamp' and `endingTimestamp' consumer parameters to filter the required timestamps. The Kafka server URI is obtained from the AWS System Manager Parameter Store.
+First script `ingest_ingest.py` is submitted to Spark / EMR. It reads data from Kafka topic for 24 hours of the previous day into PySpark. For this, we use the `startingTimestamp' and `endingTimestamp' consumer parameters to filter the required timestamps. The Kafka server URI is obtained from the AWS System Manager Parameter Store.
 
 ```python
 # Purpose: First script of the pipeline.
-# Reads PV array sensors data in batches from Kafka topic
+# Reads PV array sensors data in batches from Kafka topic 
+# and applies CWT transformation on per-device basis to 4 series of sensor readings 
 # Author:  VK.
 # Date: 2023-05-05
 

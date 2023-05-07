@@ -2,14 +2,14 @@
 
 Electrical faults in PV systems may evolve due to several abnormalities in internal configuration. We are presented with the task of **building an early detection and fault classification algorithm that uses the available electrical and environmental measurements from the sensors** deployed by most manufacturers of PV equipment.
 
-On figure 2 a typical configuration of PV system presented consisting of 5 × 3 PV array and a boost converter programmed with an MPPT algorithm to operate the PV module at their maximum power point (MPP).
+On figure 1 a typical configuration of PV system presented consisting of 5 × 3 PV array and a boost converter programmed with an MPPT algorithm to operate the PV module at their maximum power point (MPP).
 ![](i/panel_schema.jpg)
 
 in addition to a disconnection circuit and a servo motor mounted on it, normally each panel of the PV system is equipped with four sensors namely: **voltage**, **current**, **temperature** and **irradiance**. All these components are connected to microcontroller unit (MCU). 
 
 The readings from the four sensors, together with the `deviceID` and `timestamp`, is regularly sent from the MCU to the remote terminal unit and then to the SCADA system. 
 
-Futher, the data from SCADA is streamed into Apache Kafka, either deployed locally or in the cloud. In our case, input information is available at Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`. Schema presented below:
+Futher, the data from SCADA is streamed into Apache Kafka, either deployed locally or in the cloud. In our case, input information is available at Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`. Data schema shown below:
 
 ```python
 schema = StructType([
@@ -24,17 +24,17 @@ schema = StructType([
 
 From Amazon MSK the data is ingested into Amazon EMR (Amazon Elastic MapReduce), a Spark cluster deployed on AWS. For this particular task, we chose a 24-hour batch window. So data is consumed from 0:00 to 23:59:59 the day before the current day. This window can be adjusted and predictive model can be applied more frequently to narrower ranges of data. However, this will incur additional charges from EMR.
 
-For modelling we combine methods #1 and #5 from the electrical fault diagnosis methods above:
+For modelling we combine methods #1 and #5 from the [electrical fault diagnosis methods](<Fault_Detection_and_Classification_in_Photovoltaic_Arrays.markdown>):
 
 #### 1. **Statistical and Signal Processing** with Continuous Wavelet Transformation (CWT) 
 
-In the first part, we will use Continuous Wavelet Transformation to convert time series readings of voltage, current, temperature and irradiance into four coefficient matrices.
+In the first part, we will use [Continuous Wavelet Transformation](<Wavelet_Transform_intro.markdown>) to convert time series readings of voltage, current, temperature and irradiance into four coefficient matrices.
 
 As opposed to Fast Fourier Transform (FFT) which only provides frequency information but loses time information, Wavelet Transform allows simultaneous analysis of **both time and frequency**. This is particularly useful for non-stationary signals, where the frequency content changes over time.
 
 The result of applying CWT to time series data are 2D matrices called "scalograms". The "level of detail" is controlled by the "scale" parameter. The scale factor corresponds to how much a signal is scaled in time and is inversely proportional to frequency.
 
-On figure 3 Visualization of ‘‘average scalograms’’ for six fault classes.
+On figure 2 Visualization of ‘‘average scalograms’’ for six fault classes.
 ![](i/scalo_vis.jpg)
 
 #### 2. **Convolutional Neural Network** (CNN) for multi-class fault classification
