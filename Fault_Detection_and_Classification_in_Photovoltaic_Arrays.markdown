@@ -14,8 +14,6 @@ To investigate and mitigate the aforementioned faults, National Electric Code (N
 
 Specifically, the nonlinear characteristics of PV arrays, low irradiance, maximum power point tracker, faults impedance, degradation and presence of blocking diodes are some factors that prevent protection devices to trip under certain conditions. Hence, sometime faults may go undetected for a long time, showing practical limitations of conventional protection schemes in PV arrays.
 
-<br/>
-
 ### Fault diagnosis methods
 
 In general, there are two kinds kinds of fault diagnosis methods, i.e., **electrical methods**, and **thermal and visual methods**. 
@@ -28,8 +26,6 @@ The **electrical methods** can be can be further classiﬁed into:
 3. **Voltage and current measurement** detects the occurrence of faults by measuring the relevant voltage and current data, and comparing them with those in normal operation. This method is intuitive and simple, but the diagnostic accuracy is not high.
 4. **I–V curve** can reveal the changes in a PV module. The module changes when different faults occur, and the faults can be identiﬁed by comparing the curve under the same external conditions. Fault analysis using I–V is intuitive and can help verify the health of a PV module during commissioning.
 5. **Machine Learning and Artificial Neural Networks** techniques achieve automatic fault diagnosis by analysing a large amount of data. Compared with other methods, ML & ANN has a wider scope of application, not only for electrical parameters, but also for images and other information. It has advantages such as high diagnostic accuracy, low cost, accurate classification of fault types and better diagnostic performance for complex faults.
-
-<br/>
 
 ### Proposed solution description
 
@@ -87,8 +83,6 @@ The final step is to normalise and transform the data into the shape the neural 
 With an accuracy of more than 90%, it can be concluded that the combination of CWT and CNN is a reasonable option for the classification of non-stationary multiple time series/signals.
 
 By improving the CNN (adding regularisation, more neurons, etc.), different CNN architectures, hyperparameter tuning, or different scale sizes (with or without down-sampling), better results can be achieved.
-
-<br/>
 
 ### Code execution flow
 
