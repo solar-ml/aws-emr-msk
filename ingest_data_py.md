@@ -1,7 +1,7 @@
 ## Python code: ingest_data.py
 #solar_pipeline
 
-First script `ingest_ingest.py` is submitted to Spark / EMR. It reads data from Kafka topic for 24 hours of the previous day into PySpark. For this, we use the `startingTimestamp' and `endingTimestamp' consumer parameters to filter the required timestamps. The Kafka server URI is obtained from the AWS System Manager Parameter Store.
+First script `ingest_data.py` is submitted to Spark / EMR. It reads data from Kafka topic for 24 hours of the previous day into PySpark. For this, we use the `startingTimestamp' and `endingTimestamp' consumer parameters to filter the required timestamps. The Kafka server URI is obtained from the AWS System Manager Parameter Store.
 
 ```python
 # Purpose: First script of the pipeline.
@@ -25,6 +25,7 @@ from pyspark.sql.functions import collect_list, from_json, row_number, udf
 from pyspark.sql.types import (ArrayType, FloatType, StringType, StructField,
                                StructType, TimestampType)
 from pyspark.sql.window import Window
+from pyspark.sql.avro.functions import from_avro
 
 topic_input = "solar.data.segment.01"
 os.environ['AWS_DEFAULT_REGION'] = ec2_metadata.region
@@ -56,14 +57,11 @@ def main():
         StructField("irradiance", FloatType(), True)
     ])
     
-    # Deserialize the Kafka value (message) from binary to string
-    solar_pv_data = solar_pv_data.selectExpr("CAST(key AS STRING) AS deviceID", "CAST(value AS STRING) AS value")
+    # Deserialize the Kafka value (message) from binary to Avro
+    solar_pv_data = solar_pv_data.selectExpr("CAST(key AS STRING) AS deviceID", "value")
 
-    # Convert the value (message) to JSON and parse it into columns using the defined schema
-    df_24h = solar_pv_data.select("deviceID", from_json("value", schema).alias("data")).select("deviceID", "data.*")
-   
-    # format can also be AVRO, for that we need to define required schema 
-    # file continues below... 
+    # Convert the value (message) from Avro to columns using the defined schema
+    df_24h = solar_pv_data.select("deviceID", from_avro("value", schema).alias("data")).select("deviceID", "data.*")
     
     # apply CWT transform
     df_24h = process_data_cwt(df_24h)

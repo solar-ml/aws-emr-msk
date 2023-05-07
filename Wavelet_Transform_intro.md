@@ -41,3 +41,7 @@ If you plot the body accelerometer and body gyroscope signals of two different a
 Once processed with CWT, as you can see below, it is possible to manually distinguish between the different six HAR activities by visualising the continuous wavelet transformed sensor data via a scalogram.
 
 ![](i/wavelets_5.jpg)
+
+
+
+![](i/wavelets_6.jpg)
