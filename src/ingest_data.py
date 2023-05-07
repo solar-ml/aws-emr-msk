@@ -67,7 +67,7 @@ def main():
 
 def process_data_cwt(df_24h):
     """
-    Applies CWT tranformation to 4 sensor readings within window of device_id
+    Applies CWT tranformation to 4 sensor readings within window of deviceID
     """
     sensor_list = ["voltage", "current", "temperature", "irradiance"]
 

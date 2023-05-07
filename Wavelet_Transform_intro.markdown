@@ -1,4 +1,4 @@
-## Wavelet Transform introduction
+## Wavelet Transformation introduction
 #solar_pipeline
 
 The Wavelet Transform (WT) is considered to be a more powerful and preferred method than the Fast Fourier Transform (FFT) for analysing non-stationary time series data due to the following reasons:
