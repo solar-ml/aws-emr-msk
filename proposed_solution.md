@@ -25,23 +25,50 @@ Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the s
 
 Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day.
 
-### Data Flow within Amazon Web Services Applications
+### Architectural choices for data pipeline in AWS
 
-Data collected into SCADA from where it is streamed into Apache Kafka, either deployed locally or in the cloud. In our case - into Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`. 
+From a high-level overview, the data pipeline involves 2 steps: 
+
+1. The first involves reading batch data from the Kafka topic with PySpark, applying wavelet signal processing independently for each device and each of the 4 time series, and saving the processed data to a parquet file in the `silver` staging bucket.
+
+2. Second step involves reading data from `silver` bucket, transforming it into the shape required by neural network and using pre-trained TensorFlow model to classify state of each device into 1 of 6 conditions. The data is then stored in the `gold` bucket along with the predictions.
+
+3. From there, data is accessible via API gateway, which gives access to lambda function that queries parquet based on deviceID and returns JSON result.
+
+Thus, our case consists of batch processing of electrical and environmental readings from a solar PV plant with 10k solar panels, which are constantly added to the Kafka topic, but only consumed once a day. The main limiting factor is the second step of our pipeline, which requires the use of a pre-trained Tensorflow model to classify the datasets.
+
+Although there are numerous data processing options available in AWS, we consider between AWS Glue, Amazon EMR on EC2/EKS or Amazon EMR Serverless (available in production since June 2022). 
+
+AWS Glue is better suited for ETL workflows that require data discovery, preparation, and integration with other AWS services. While AWS Glue is perfect for most ETL tasks, there are some limitations on the size of dependencies for AWS Glue jobs. Although Glue supports third-party Python libraries, which you can install using the `--additional-python-modules' parameter, the maximum size of a single dependency file is 50MB, and the total size of all dependencies combined is 250MB. But, the TensorFlow pip package for Linux systems is about 500MB (TensorFlow Docker image is about 2 GB).
+
+Amazon EMR on EC2/EKS or EMR Serverless are more appropriate for analytics applications that require high performance processing using open source tools. Since our task is a fairly short-term conversion, continuous operation of the EMR cluster is not financially viable.
+
+Running EMR Serverless can be less expensive and faster than creating and terminating EMR clusters programmatically with AWS CLI or StepFunctions, especially for short-lived and sporadic computing tasks. This is due to the following reasons:
+
+1. Pay-per-use pricing: With EMR Serverless, you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs.
+
+2. Resource allocation and scaling: EMR Serverless automatically scales resources based on workload, ensuring you only pay for what you need. In contrast, with EMR on EC2, you may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods.
+
+Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS where there is a massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0' and adding TensorFlow to it.
+
+![](data_pipeline_with_amazon_emr_serverless_and_amazon_msk.png)
 
 
+
+
+The data originates from SCADA system, which uses `kafka-producer` application to stream into Apache Kafka, deployed either on-premises or in the cloud. In our case - into Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`.
 
 From Amazon MSK the data is ingested into Amazon EMR (Amazon Elastic MapReduce), a Spark/Hadoop/Hive cluster deployed on AWS. For this particular task, we chose a 24-hour batch window. So data is consumed from 0:00 to 23:59:59 the day before the current day. This window can be adjusted and predictive model can be applied more frequently to narrower ranges of data. However, this will incur additional charges from EMR.
 
-Moreover, our pipeline can also be transformed into a near real-time streaming application. To achieve this, we can use Spark Structured Streaming to consume data from Apache Kafka with a tumbling event-time window in real-time. We then apply CWT transformation to the data bucketed within this window. The results are fed into a predictive model. The processed dataset, where each device state within a given interval is classified into 6 fault types, is exposed via a web service for use in the analytical dashboard and predictive maintenance reporting. This provides users with fast and granular PV array status updates. However, this use case requires the EMR cluster to run continuously, deployed on EC2 instances or EKS.
+Moreover, while we handle batch processing with EMR Serverless within this pipeline it can also be converted into a near real-time streaming application. To achieve this, we can use Spark Structured Streaming to consume data from Apache Kafka with a tumbling event-time window in real-time. We then apply CWT transformation to the data bucketed within this window. The results are fed into a predictive model. The processed dataset, where each device state within a given interval is classified into 6 fault types, is exposed via a web service for use in the analytical dashboard and predictive maintenance reporting. This provides users with fast and granular PV array status updates. However, this use case requires the EMR cluster to run continuously, deployed on EC2 instances or EKS.
 
 ### Algorithm: Combination of signal processing and convolutional neural network.
 
-For modelling we combine methods #1 and #5 from the [electrical fault diagnosis methods](<Fault_Detection_and_Classification_in_Photovoltaic_Arrays.md>):
+For modelling we combine methods #1 and #5 from the [electrical fault diagnosis methods](<fault_detection_and_classification.md>):
 
 #### 1. **Statistical and Signal Processing** with Continuous Wavelet Transformation (CWT) 
 
-First, we will use the [Continuous Wavelet Transformation](<Wavelet_Transform_intro.md>) to convert time series measurements of voltage, current, temperature and irradiance into four coefficient matrices.
+First, we will use the [Continuous Wavelet Transformation](<wavelet_transform_intro.md>) to convert time series measurements of voltage, current, temperature and irradiance into four coefficient matrices.
 
 As opposed to Fast Fourier Transform (FFT) which only provides frequency information but loses time information, Wavelet Transform allows simultaneous analysis of **both time and frequency**. This is particularly useful for non-stationary signals, where the frequency content changes over time.
 
@@ -83,3 +110,21 @@ Let us go through the step necessary to transform the data and apply the classif
 4. Second script in pipeline `predict_fault.py` loads parquet file, feeds into pre-trained LeNet, gets its prediction classes, appends classes as extra column and stores result in gold S3 bucket. 
 
 The Kafka cluster URIs, names of the silver and gold S3 buckets are obtained from the AWS System Manager Parameter Store.
+
+
+From a high-level overview, the data pipeline involves 2 steps: 
+
+1. The first involves reading batch data from the Kafka topic with PySpark, applying wavelet signal processing independently for each device and each of the 4 time series, and saving the processed data to a parquet file in the `silver` staging bucket.
+
+2. Second step involves reading data from `silver` bucket, transforming it into the shape required by neural network and using pre-trained TensorFlow model to classify state of each device into 1 of 6 conditions. The data is then stored in the `gold` bucket along with the predictions.
+
+From there, data is accessible via API gateway, which gives access to lambda function that queries parquet based on deviceID and returns JSON result.
+
+<!-- 
+From high level overview data pipeline includes 2 steps: 
+
+1. First involves reading batch data from Kafka topic with PySpark, applying wavelet signal processing independently for each device and each of 4 time-series, and saving processed data into parquet file in `silver` staging bucket.
+
+2. Second step involves reading data from `silver` bucket, transform it to the shape required by neural network and use pre-trained TensorFlow model to classify state of devices into 1 of 6 conditions. Then data together with predictions is saved into `gold` bucket.
+
+From there data it accessible via API Gateway which accesses lambda function that queries parquet based on deviceID and return JSON result -->
