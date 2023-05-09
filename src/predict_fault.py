@@ -1,6 +1,6 @@
 # Purpose: Second script of the pipeline loads Parquet file, feeds into pre-trained LeNet, 
 # gets its prediction classes, appends classes as extra column and save result into gold S3 bucket. 
-# Author:  VK.
+# Author:  VK
 # Date: 2023-05-05
 
 import datetime

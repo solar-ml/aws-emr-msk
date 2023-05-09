@@ -1,7 +1,6 @@
-# Purpose: First script of the pipeline.
-# Reads PV array sensors data in batches from Kafka topic 
-# and applies CWT transformation on per-device basis to 4 series of sensor readings 
-# Author:  VK.
+# Purpose: First script in the pipeline. Reads PV array sensor data in batches from Kafka topic 
+# and apply the CWT transformation on a per-device basis to 4 time series of sensor readings.
+# Author:  VK
 # Date: 2023-05-05
 
 import datetime

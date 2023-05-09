@@ -1,6 +1,6 @@
 # Purpose: LeNet5 CNN 64x64 reference implementation. 
-# For demonstration purposes, not intended to run without properly prepared labelled training data.
-# Author:  VK.
+# For demonstration purposes only.
+# Author:  VK
 # Date: 2023-05-05
 
 import tensorflow as tf
