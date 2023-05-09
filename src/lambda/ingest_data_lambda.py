@@ -18,7 +18,7 @@ def lambda_handler(event, context):
         "releaseLabel": "emr-6.3.0-latest",
         "jobDriver": {
         "sparkSubmitJobDriver": {
-            "entryPoint": "s3://bootstrap/ingest_data.py",
+            "entryPoint": "s3://bootstrap/spark/ingest_data.py",
             "entryPointArguments": [kafka_uris, kafka_topics],
             "sparkSubmitParameters": "--conf spark.executor.instances=2 --conf spark.executor.memory=4G --conf spark.driver.cores=1"
         }

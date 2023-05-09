@@ -6,8 +6,8 @@ import boto3
 def lambda_handler(event, context):
     # Get the names of the silver and gold S3 buckets from the Parameter Store
     ssm = boto3.client('ssm')
-    silver_bucket = ssm.get_parameter(Name='silver_bucket')['Parameter']['Value']
-    gold_bucket = ssm.get_parameter(Name='gold_bucket')['Parameter']['Value']
+    silver_bucket = ssm.get_parameter(Name='silver-bucket')['Parameter']['Value']
+    gold_bucket = ssm.get_parameter(Name='gold-bucket')['Parameter']['Value']
 
     # Create an EMR job request with the predict_fault.py script and the S3 buckets
     emr = boto3.client('emr-containers')
@@ -18,7 +18,7 @@ def lambda_handler(event, context):
         "releaseLabel": "emr-6.3.0-latest",
         "jobDriver": {
         "sparkSubmitJobDriver": {
-            "entryPoint": "s3://bootstrap/predict_fault.py",
+            "entryPoint": "s3://bootstrap/spark/predict_fault.py",
             "entryPointArguments": [silver_bucket, gold_bucket],
             "sparkSubmitParameters": "--conf spark.executor.instances=2 --conf spark.executor.memory=4G --conf spark.driver.cores=1"
         }

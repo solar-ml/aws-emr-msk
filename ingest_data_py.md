@@ -168,7 +168,7 @@ def get_previous_day_timestamps():
     return Timestamps(start=starting_timestamp, end=ending_timestamp)
 
 ```
-Next, we normalise and save the processed data in Parquet format to the S3 silver (staging) bucket.
+Next, we normalize and save the processed data in Parquet format to the S3 silver (staging) bucket.
 
 ```python
 def write_data(df_24h, silver_bucket):
@@ -190,9 +190,9 @@ def get_parameters():
 
     params = {
         "kafka_servers": ssm_client.get_parameter(
-            Name="/kafka_spark_demo/kafka_servers")["Parameter"]["Value"],
+            Name="kafka_servers")["Parameter"]["Value"],
         "silver_bucket": ssm_client.get_parameter(
-            Name="/kafka_spark_demo/silver_bucket")["Parameter"]["Value"],
+            Name="silver-bucket")["Parameter"]["Value"],
     }
 
     return params

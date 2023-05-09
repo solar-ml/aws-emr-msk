@@ -130,9 +130,9 @@ def get_parameters():
 
     params = {       
         "silver_bucket": ssm_client.get_parameter(
-            Name="/kafka_spark_demo/silver_bucket")["Parameter"]["Value"],
+            Name="silver-bucket")["Parameter"]["Value"],
         "gold_bucket": ssm_client.get_parameter(
-            Name="/kafka_spark_demo/gold_bucket")["Parameter"]["Value"],
+            Name="gold-bucket")["Parameter"]["Value"],
     }
 
     return params
