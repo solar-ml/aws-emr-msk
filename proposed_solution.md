@@ -37,7 +37,7 @@ From a high-level overview, the data pipeline involves 2 steps:
 
 Thus, our case consists of batch processing of electrical and environmental readings from a solar PV plant with 10k solar panels, which are constantly added to the Kafka topic, but only consumed once a day. The main limiting factor is the second step of our pipeline, which requires the use of a pre-trained Tensorflow model to classify the datasets.
 
-Although there are numerous data processing options available in AWS, we consider between AWS Glue, Amazon EMR on EC2/EKS or Amazon EMR Serverless (available in production since June 2022). 
+Although there are numerous data processing options available in AWS, we consider between **AWS Glue**, **Amazon EMR on EC2/EKS** or **Amazon EMR Serverless** (available in production since June 2022). 
 
 AWS Glue is better suited for ETL workflows that require data discovery, preparation, and integration with other AWS services. While AWS Glue is perfect for most ETL tasks, there are some limitations on the size of dependencies for AWS Glue jobs. Although Glue supports third-party Python libraries, which you can install using the `--additional-python-modules` parameter, the maximum size of a single dependency file is 50MB, and the total size of all dependencies combined is 250MB. But, the TensorFlow pip package for Linux systems is about 500MB (TensorFlow Docker image is about 2 GB).
 
@@ -51,28 +51,38 @@ Running EMR Serverless can be less expensive and faster than creating and termin
 
 Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS where there is a massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow to it.
 
-![](data_pipeline_with_amazon_emr_serverless_and_amazon_msk.png)
+![](aws_data_pipeline.png)
 
-We use **EventBridge** to schedule the execution of **AWS StepFunctions** state machine to orchestrate two Spark jobs and handle failures and retries. The state machine consists of 10 states, each performing a specific task or decision. 
+The entry point is an **EventBridge** that schedules the execution of the **AWS StepFunctions** state machine to orchestrate two Spark jobs and handle failures and retries. 
+
+The state machine shown below consists of 10 states, each of which performs a specific task or decision.
 
 ![](i/stepfunctions_graph.svg)
 
 Most important steps are:
 
-- `IngestData` **Task** state triggers a Lambda function `ingest_data` which is responsible for running the `ingest_data.py` script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a Kafka cluster. The function takes care of configuring and submitting the EMR job and returns the `job_id` and `wait_time`. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
+- `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which is responsible for running the `ingest_data.py` script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a Kafka cluster. The function takes care of configuring and submitting the EMR job and returns the `job_id` and `wait_time`. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
 
-- `WaitForIngestData` **Wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is returned from the previous step and an estimated wait time based on the size of the data to be ingested. This wait time is used to avoid polling the EMR job status too frequently. 
+- `WaitForIngestData` **wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is returned from the previous step and an estimated wait time based on the size of the data to be ingested. This wait time is used to avoid polling the EMR job status too frequently. 
 
-- `GetIngestDataStatus` **Task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `describe_job_run` method on the EMR client and passing the virtual cluster ID and the job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the NotifyFailure state.
+- `GetIngestDataStatus` **task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `describe_job_run` method on the EMR client and passing the virtual cluster ID and the job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the NotifyFailure state.
 
-`CheckIngestDataStatus` **Choice** state evaluates the status of data ingestion. If it has succeeded, it moves to the `PredictFault` state. If it has failed, it moves to the `NotifyFailure` state. If the status is unknown, it moves back to the `WaitForIngestData` state.
+- `CheckIngestDataStatus` **choice** state evaluates the status of data ingestion. If it has succeeded, it moves to the `PredictFault` state. If it has failed, it moves to the `NotifyFailure` state. If the status is unknown, it moves back to the `WaitForIngestData` state.
 
-- `PredictFault`, `WaitForPredictFault`, `GetPredictFaultStatus`, `CheckPredictFaultStatus` states repeat the same pattern as in 4 steps above, including submitting second EMR job to EMR Serverless via lambda function call.
+- `PredictFault`, `WaitForPredictFault`, `GetPredictFaultStatus`, `CheckPredictFaultStatus` states repeat the same pattern as the 4 steps above, including submitting the second EMR job to EMR Serverless via lambda function call and monitoring its execution state.
 
-- `NotifySuccess` **Task** state triggers a Lambda function `notify_success` to send a notification about the successful completion of the Spark jobs. 
+- `NotifySuccess` **task** state triggers a Lambda function `notify_success` to send a notification about the successful completion of the Spark jobs. 
 
-- `NotifyFailure` **Task** state triggers a Lambda function `notify_failure` to send a notification about the failure of any of the previous steps. 
+- `NotifyFailure` **task** state triggers a Lambda function `notify_failure` to send a notification about the **failure of any of the previous steps**. 
 
+
+Advantages of this approach:
+
+- **Error handling**: The state machine handles errors at each Task state, providing a robust way to manage failures.
+- **Retries**: The state machine retries failed Lambda functions with an exponential backoff strategy, which reduces the impact of transient errors.
+Status monitoring: The state machine continuously checks the status of the Spark jobs and takes appropriate actions based on the job status.
+Orchestration: Step Functions make it easy to manage complex workflows by breaking them into smaller, manageable states.
+Modularity: Each state in the state machine has a specific purpose, making the workflow easier to understand
 
 
 The data originates from SCADA system, which uses `kafka-producer` application to stream into Apache Kafka, deployed either on-premises or in the cloud. In our case - into Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`.
