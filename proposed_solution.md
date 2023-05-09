@@ -53,6 +53,25 @@ Currently EMR Serverless only includes Spark and Hive as pre-installed applicati
 
 ![](data_pipeline_with_amazon_emr_serverless_and_amazon_msk.png)
 
+We use **EventBridge** to schedule the execution of **AWS StepFunctions** state machine to orchestrate two Spark jobs and handle failures and retries. The state machine consists of 10 states, each performing a specific task or decision. 
+
+![](i/stepfunctions_graph.svg)
+
+Most important steps are:
+
+- `IngestData` **Task** state triggers a Lambda function `ingest_data` which is responsible for running the `ingest_data.py` script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a Kafka cluster. The function takes care of configuring and submitting the EMR job and returns the `job_id` and `wait_time`. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
+
+- `WaitForIngestData` **Wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is returned from the previous step and an estimated wait time based on the size of the data to be ingested. This wait time is used to avoid polling the EMR job status too frequently. 
+
+- `GetIngestDataStatus` **Task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `describe_job_run` method on the EMR client and passing the virtual cluster ID and the job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the NotifyFailure state.
+
+`CheckIngestDataStatus` **Choice** state evaluates the status of data ingestion. If it has succeeded, it moves to the `PredictFault` state. If it has failed, it moves to the `NotifyFailure` state. If the status is unknown, it moves back to the `WaitForIngestData` state.
+
+- `PredictFault`, `WaitForPredictFault`, `GetPredictFaultStatus`, `CheckPredictFaultStatus` states repeat the same pattern as in 4 steps above, including submitting second EMR job to EMR Serverless via lambda function call.
+
+- `NotifySuccess` **Task** state triggers a Lambda function `notify_success` to send a notification about the successful completion of the Spark jobs. 
+
+- `NotifyFailure` **Task** state triggers a Lambda function `notify_failure` to send a notification about the failure of any of the previous steps. 
 
 
 
@@ -110,21 +129,3 @@ Let us go through the step necessary to transform the data and apply the classif
 4. Second script in pipeline `predict_fault.py` loads parquet file, feeds into pre-trained LeNet, gets its prediction classes, appends classes as extra column and stores result in gold S3 bucket. 
 
 The Kafka cluster URIs, names of the silver and gold S3 buckets are obtained from the AWS System Manager Parameter Store.
-
-
-From a high-level overview, the data pipeline involves 2 steps: 
-
-1. The first involves reading batch data from the Kafka topic with PySpark, applying wavelet signal processing independently for each device and each of the 4 time series, and saving the processed data to a parquet file in the `silver` staging bucket.
-
-2. Second step involves reading data from `silver` bucket, transforming it into the shape required by neural network and using pre-trained TensorFlow model to classify state of each device into 1 of 6 conditions. The data is then stored in the `gold` bucket along with the predictions.
-
-From there, data is accessible via API gateway, which gives access to lambda function that queries parquet based on deviceID and returns JSON result.
-
-<!-- 
-From high level overview data pipeline includes 2 steps: 
-
-1. First involves reading batch data from Kafka topic with PySpark, applying wavelet signal processing independently for each device and each of 4 time-series, and saving processed data into parquet file in `silver` staging bucket.
-
-2. Second step involves reading data from `silver` bucket, transform it to the shape required by neural network and use pre-trained TensorFlow model to classify state of devices into 1 of 6 conditions. Then data together with predictions is saved into `gold` bucket.
-
-From there data it accessible via API Gateway which accesses lambda function that queries parquet based on deviceID and return JSON result -->
