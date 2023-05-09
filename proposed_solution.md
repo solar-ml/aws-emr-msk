@@ -1,15 +1,15 @@
-## Proposed solution
+## Problem description
 
 Electrical faults in PV systems may evolve due to several abnormalities in internal configuration. We are presented with the task of **building an early detection and fault classification algorithm that uses the available electrical and environmental measurements from the sensors** deployed by most manufacturers of PV equipment.
 
-On figure 1 a typical configuration of PV system presented consisting of 5 × 3 PV array and a boost converter programmed with an MPPT algorithm to operate the PV module at their maximum power point (MPP).
+Figure 1 shows a typical PV system configuration consisting of a 5 × 3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical photovoltaic panel problems are shown symbolically.
 ![](i/panel_schema.jpg)
 
-In addition to a disconnection circuit and a servo motor mounted on it, normally each panel of the PV system is equipped with four sensors namely: `voltage`, `current`, `temperature` and `irradiance`. All these components are connected to microcontroller unit (MCU). 
+Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
 
-### Incoming data
+### Incoming data 
 
-The incoming data contains the readings from the four sensors, together with the `deviceID` and `timestamp`, is regularly sent from the MCU to the remote terminal unit and then to the SCADA system. Data schema shown below:
+The incoming data contains the readings from the four sensors, together with the `deviceID` and `timestamp`. Schema presented below:
 
 ```python
 schema = StructType([
@@ -21,11 +21,15 @@ schema = StructType([
         StructField("irradiance", FloatType(), True) # bytes
     ])
 ```
-Therefore each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the incoming data stream, we consider the size of each data point and the rate at which they are generated. Assuming readings from 4 sensors deployed on 10,000 solar panels are collected into the SCADA system every 20 seconds for 24 hours.
+Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the incoming data stream, we consider the size of each data point and the rate at which they are generated. Assuming readings from 4 sensors deployed on 10,000 solar panels are collected into the SCADA system every 20 seconds for 24 hours.
 
-Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = 1.47GB or 1.37GiB
+Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day.
 
-Further, this data from SCADA is streamed into Apache Kafka, either deployed locally or in the cloud. In our case, input information is available at Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`. 
+### Data Flow within Amazon Web Services Applications
+
+Data collected into SCADA from where it is streamed into Apache Kafka, either deployed locally or in the cloud. In our case - into Amazon Managed Streaming for Apache Kafka (Amazon MSK). The name of the input topic is `solar.data.segment.01`. 
+
+
 
 From Amazon MSK the data is ingested into Amazon EMR (Amazon Elastic MapReduce), a Spark/Hadoop/Hive cluster deployed on AWS. For this particular task, we chose a 24-hour batch window. So data is consumed from 0:00 to 23:59:59 the day before the current day. This window can be adjusted and predictive model can be applied more frequently to narrower ranges of data. However, this will incur additional charges from EMR.
 
@@ -58,13 +62,13 @@ We will use CNNs because they are very efficient at learning characteristic patt
 
 To transform the signals of the solar PV dataset using the `pywt.cwt()` function, we choose the Morlet mother wavelet and a scale size of 64.
 
-It is important to clarify how to feed the resulting CWT coefficient matrices into the CNN. The best approach here is to **layer the 2D coefficients** (images) of the four signals like the three Red, Green, Blue (RGB) channels of a colour image. This allows all the **dependencies between the different sensor data to be taken into account simultaneously**, which is very important.
+It is important to clarify how to feed the resulting CWT coefficient matrices into the CNN. The best approach here is to **layer the 2D coefficients** (images) of the four signals like the three Red, Green, Blue (RGB) channels of a color image. This allows all the **dependencies between the different sensor data to be taken into account simultaneously**, which is very important.
 
-The final step is to normalise and transform the data into the shape the neural network expects and apply the stored pre-trained model to classify and detect 6 types of faults.
+The final step is to normalize and transform the data into the shape the neural network expects and apply the stored pre-trained model to classify and detect 6 types of faults.
 
 With an accuracy of more than 90%, it can be concluded that the combination of CWT and CNN is a reasonable option for the classification of non-stationary multiple time series/signals.
 
-By improving the CNN (adding regularisation, more neurons, etc.), different CNN architectures, hyperparameter tuning, or different scale sizes (with or without down-sampling), better results can be achieved.
+By improving the CNN (adding regularization, more neurons, etc.), different CNN architectures, hyperparameter tuning, or different scale sizes (with or without down-sampling), better results can be achieved.
 
 ### Code execution flow
 
@@ -72,9 +76,9 @@ Let us go through the step necessary to transform the data and apply the classif
 
 1. First script `ingest_data.py` is submitted to Spark at EMR. It reads data from Kafka topic for 24 hours of the previous day into PySpark. For this, we use the `startingTimestamp` and `endingTimestamp` consumer parameters to filter the required timestamps. 
 
-2. Next, we apply the Continuous Wavelet Transform (CWT) using the Morlet mother wavelet with a scale of 64, and then stack the 2D scalograms like channels of a colour image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 images.
+2. Next, we apply the Continuous Wavelet Transform (CWT) using the Morlet mother wavelet with a scale of 64, and then stack the 2D scalograms like channels of a color image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 images.
 
-3. Next, we normalise and save the processed data in Parquet format to the S3 silver (staging) bucket.
+3. Next, we normalize and save the processed data in Parquet format to the S3 silver (staging) bucket.
 
 4. Second script in pipeline `predict_fault.py` loads parquet file, feeds into pre-trained LeNet, gets its prediction classes, appends classes as extra column and stores result in gold S3 bucket. 
 
