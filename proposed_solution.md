@@ -33,13 +33,13 @@ From a high-level overview, the data pipeline involves 2 steps:
 
 2. Second step involves reading data from `silver` bucket, transforming it into the shape required by neural network and using pre-trained TensorFlow model to classify state of each device into 1 of 6 conditions. The data is then stored in the `gold` bucket along with the predictions.
 
-3. From there, data is accessible via API gateway, which gives access to lambda function that queries parquet based on deviceID and returns JSON result.
+3. From there, data is accessible via API Gateway, which gives access to lambda function that queries parquet based on deviceID and returns JSON result.
 
 Thus, our case consists of batch processing of electrical and environmental readings from a solar PV plant with 10k solar panels, which are constantly added to the Kafka topic, but only consumed once a day. The main limiting factor is the second step of our pipeline, which requires the use of a pre-trained Tensorflow model to classify the datasets.
 
 Although there are numerous data processing options available in AWS, we consider between AWS Glue, Amazon EMR on EC2/EKS or Amazon EMR Serverless (available in production since June 2022). 
 
-AWS Glue is better suited for ETL workflows that require data discovery, preparation, and integration with other AWS services. While AWS Glue is perfect for most ETL tasks, there are some limitations on the size of dependencies for AWS Glue jobs. Although Glue supports third-party Python libraries, which you can install using the `--additional-python-modules' parameter, the maximum size of a single dependency file is 50MB, and the total size of all dependencies combined is 250MB. But, the TensorFlow pip package for Linux systems is about 500MB (TensorFlow Docker image is about 2 GB).
+AWS Glue is better suited for ETL workflows that require data discovery, preparation, and integration with other AWS services. While AWS Glue is perfect for most ETL tasks, there are some limitations on the size of dependencies for AWS Glue jobs. Although Glue supports third-party Python libraries, which you can install using the `--additional-python-modules` parameter, the maximum size of a single dependency file is 50MB, and the total size of all dependencies combined is 250MB. But, the TensorFlow pip package for Linux systems is about 500MB (TensorFlow Docker image is about 2 GB).
 
 Amazon EMR on EC2/EKS or EMR Serverless are more appropriate for analytics applications that require high performance processing using open source tools. Since our task is a fairly short-term conversion, continuous operation of the EMR cluster is not financially viable.
 
@@ -49,7 +49,7 @@ Running EMR Serverless can be less expensive and faster than creating and termin
 
 2. Resource allocation and scaling: EMR Serverless automatically scales resources based on workload, ensuring you only pay for what you need. In contrast, with EMR on EC2, you may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods.
 
-Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS where there is a massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0' and adding TensorFlow to it.
+Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS where there is a massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow to it.
 
 ![](data_pipeline_with_amazon_emr_serverless_and_amazon_msk.png)
 
