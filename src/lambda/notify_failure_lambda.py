@@ -6,7 +6,7 @@ import boto3
 def lambda_handler(event, context):
     # Get the SNS topic ARN from the Parameter Store
     ssm = boto3.client('ssm')
-    sns_topic = ssm.get_parameter(Name='sns_topic')['Parameter']['Value']
+    sns_topic = ssm.get_parameter(Name='sns-topic')['Parameter']['Value']
 
     # Create a message with the pipeline details and the error
     message = f"The data pipeline has failed.\n"

@@ -3,41 +3,53 @@
 
 import boto3
 
+
 def lambda_handler(event, context):
-    # Get the Kafka cluster URIs and topic names from the Parameter Store
-    ssm = boto3.client('ssm')
-    kafka_uris = ssm.get_parameter(Name='kafka_uris')['Parameter']['Value']
-    kafka_topics = ssm.get_parameter(Name='kafka_topics')['Parameter']['Value']
+    def get_job_run(client, app_id: str, job_run_id: str) -> dict:
+        response = client.get_job_run(applicationId=app_id, jobRunId=job_run_id)
+        return response.get("jobRun")
 
-    # Create an EMR job request with the ingest_data.py script and the Kafka parameters
-    emr = boto3.client('emr-containers')
-    job_request = {
-        "name": "IngestData",
-        "virtualClusterId": "vc-123456789012",
-        "executionRoleArn": "arn:aws:iam::123456789012:role/EMRContainersExecutionRole",
-        "releaseLabel": "emr-6.3.0-latest",
-        "jobDriver": {
-        "sparkSubmitJobDriver": {
-            "entryPoint": "s3://bootstrap/spark/ingest_data.py",
-            "entryPointArguments": [kafka_uris, kafka_topics],
-            "sparkSubmitParameters": "--conf spark.executor.instances=2 --conf spark.executor.memory=4G --conf spark.driver.cores=1"
-        }
+    ssm = boto3.client("ssm")
+    kafka_uris = ssm.get_parameter(Name="kafka-servers")["Parameter"]["Value"]
+    kafka_topics = ssm.get_parameter(Name="kafka-topics")["Parameter"]["Value"]
+    
+    # EMR Serverless application is created beforehand and re-used between the steps
+    emr = boto3.client("emr-serverless")
+    application_id = ssm.get_parameter(Name="emr-app-id")["Parameter"]["Value"]
+    
+    # S3 bucket for EMR logs
+    log_bucket = ssm.get_parameter(Name="log-bucket")["Parameter"]["Value"]
+
+    response = emr.start_job_run(
+        applicationId=application_id,
+        executionRoleArn="arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
+        jobDriver={
+            "sparkSubmit": {
+                "entryPoint": "s3://bootstrap/spark/ingest_data.py",
+                # for now kafka-topic is hard coded in `ingest_data.py`
+                # and kafka_uris is obtained from SSM
+                "entryPointArguments": [kafka_uris, kafka_topics],
+                "sparkSubmitParameters": "--conf spark.executor.cores=1 --conf spark.executor.memory=4g --conf spark.driver.cores=1 --conf spark.driver.memory=4g --conf spark.executor.instances=1",
+            }
         },
-        "configurationOverrides": {
-        "applicationConfiguration": [
-            {
-            "classification": "spark-defaults",
-            "properties": {
-                "spark.dynamicAllocation.enabled": "false"
-            }
-            }
-        ]
-        }
-    }
+        configurationOverrides={
+            "monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": f"s3://{log_bucket}/emr"}}
+        },
+    )
 
-    # Submit the EMR job and get the job ID
-    response = emr.start_job_run(jobRunRequest=job_request)
-    job_id = response['id']
+    job_run_id = response.get("jobRunId")
 
-    # Return the job ID
-    return job_id
+    # we replace these frequent checks in favor or polling
+    # wait = True
+    # job_done = False
+    # while wait and not job_done:
+    #     jr_response = get_job_run(client, application_id, job_run_id)
+    #     # 'state': 'SUBMITTED'|'PENDING'|'SCHEDULED'|'RUNNING'|'SUCCESS'|'FAILED'|'CANCELLING'|'CANCELLED',
+    #     job_done = jr_response.get("state") in [
+    #         "SUCCESS",
+    #         "FAILED",
+    #         "CANCELLING",
+    #         "CANCELLED",
+    #     ]
+
+    return job_run_id

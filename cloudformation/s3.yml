@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  BootstrapBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: bootstrap-bucket
+
+  LogBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: log-bucket
+
+  SilverBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: silver-bucket
+
+  GoldBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: gold-bucket
+
+Outputs:
+  BootstrapBucketName:
+    Description: 'The name of the bootstrap bucket'
+    Value: !Ref BootstrapBucket
+
+  LogBucketName:
+    Description: 'The name of the log bucket'
+    Value: !Ref LogBucket
+
+  SilverBucketName:
+    Description: 'The name of the silver bucket'
+    Value: !Ref SilverBucket
+
+  GoldBucketName:
+    Description: 'The name of the gold bucket'
+    Value: !Ref GoldBucket

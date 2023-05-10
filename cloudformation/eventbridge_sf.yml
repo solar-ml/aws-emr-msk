@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  StartStepFunctionDailyRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: StartStepFunctionDaily
+      ScheduleExpression: 'cron(0 13 * * ? *)'
+      State: ENABLED
+      Targets:
+        - Id: 1
+          Arn: !Sub 'arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:EMR_Pipeline_StateMachine_v2'
+          RoleArn: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/your-eventbridge-role'
+          Input: '{"wait_time": 300}'
+
+Outputs:
+  RuleName:
+    Description: 'The name of the EventBridge rule that starts the Step Function daily.'
+    Value: !Ref StartStepFunctionDailyRule

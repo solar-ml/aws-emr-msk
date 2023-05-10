@@ -1,0 +1,206 @@
+{
+  "Comment": "A state machine to orchestrate 2 Spark jobs and handle failures and retries",
+  "StartAt": "IngestData",
+  "States": {
+    "IngestData": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ingest_data",
+      "ResultPath": "$.result.ingest_job_id",
+      "Next": "WaitForIngestData",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "NotifyFailure"
+        }
+      ]
+    },
+    "WaitForIngestData": {
+      "Type": "Wait",
+      "Next": "GetIngestDataStatus",
+      "SecondsPath": "$.wait_time"
+    },
+    "GetIngestDataStatus": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:get_ingest_data_status",
+      "InputPath": "$.result.ingest_job_id",
+      "ResultPath": "$.ingest_status",
+      "Next": "CheckIngestDataStatus",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "NotifyFailure"
+        }
+      ]
+    },
+    "CheckIngestDataStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.ingest_status.status",
+          "StringEquals": "SUCCEEDED",
+          "Next": "PredictFault"
+        },
+        {
+          "Variable": "$.ingest_status.status",
+          "StringEquals": "FAILED",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Default": "WaitForIngestData"
+    },
+    "PredictFault": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:predict_fault",
+      "ResultPath": "$.result.predict_job_id",
+      "Next": "WaitForPredictFault",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "NotifyFailure"
+        }
+      ]
+    },
+    "WaitForPredictFault": {
+      "Type": "Wait",
+      "SecondsPath": "$.wait_time",
+      "Next": "GetPredictFaultStatus"
+    },
+    "GetPredictFaultStatus": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:get_predict_fault_status",
+      "InputPath": "$.result.predict_job_id",
+      "ResultPath": "$.predict_status",
+      "Next": "CheckPredictFaultStatus",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "NotifyFailure"
+        }
+      ]
+    },
+    "CheckPredictFaultStatus": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.predict_status.status",
+          "StringEquals": "SUCCEEDED",
+          "Next": "NotifySuccess"
+        },
+        {
+          "Variable": "$.predict_status.status",
+          "StringEquals": "FAILED",
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Default": "WaitForPredictFault"
+    },
+    "NotifySuccess": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:notify_success",
+      "Parameters": {
+        "ingest_job_id.$": "$.result.ingest_job_id",
+        "predict_job_id.$": "$.result.predict_job_id"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "NotifyFailure"
+        }
+      ],
+      "Next": "Success"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "NotifyFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:notify_failure",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}

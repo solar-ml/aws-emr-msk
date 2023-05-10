@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  KafkaServersParam:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: kafka-servers
+      Type: String
+      Value: '<your-kafka-servers>'
+
+  KafkaTopicsParam:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: kafka-topics
+      Type: String
+      Value: '<your-kafka-topics>'
+
+  SnsTopicParam:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: sns-topic
+      Type: String
+      Value: '<your-sns-topic-arn>'
+
+  EmrAppIdParam:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Name: emr-app-id
+      Type: String
+      Value: '<your-emr-app-id>'
+
+Outputs:
+  KafkaServersParameterName:
+    Description: 'The name of the Parameter Store entry for the Kafka servers'
+    Value: !Ref KafkaServersParam
+
+  KafkaTopicsParameterName:
+    Description: 'The name of the Parameter Store entry for the Kafka topics'
+    Value: !Ref KafkaTopicsParam
+
+  SnsTopicParameterName:
+    Description: 'The name of the Parameter Store entry for the SNS topic ARN'
+    Value: !Ref SnsTopicParam
+
+  EmrAppIdParameterName:
+    Description: 'The name of the Parameter Store entry for the EMR app ID'
+    Value: !Ref EmrAppIdParam

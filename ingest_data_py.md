@@ -65,12 +65,12 @@ def main():
     # apply CWT transform
     df_24h = process_data_cwt(df_24h)
     
-    # outpit processed file to S3 silver (staging bucket)
+    # output processed file to S3 silver (staging bucket)
     write_data(df_24h, params["silver_bucket"])
 
 ```
 
-Next, we apply the Continuous Wavelet Transform (CWT) using the Morlet mother wavelet with a scale of 64, and then stack the 2D scalograms like channels of a colour image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 images.
+Next, we apply the Continuous Wavelet Transform (CWT) using the Morlet mother wavelet with a scale of 64, and then stack the 2D scalograms like channels of a color image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 images.
 
 ```python    
 def process_data_cwt(df_24h):
@@ -190,7 +190,7 @@ def get_parameters():
 
     params = {
         "kafka_servers": ssm_client.get_parameter(
-            Name="kafka_servers")["Parameter"]["Value"],
+            Name="kafka-servers")["Parameter"]["Value"],
         "silver_bucket": ssm_client.get_parameter(
             Name="silver-bucket")["Parameter"]["Value"],
     }
