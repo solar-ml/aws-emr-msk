@@ -171,7 +171,7 @@ emr-app-id
 
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which is responsible for running the `ingest_data.py` script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a Kafka cluster. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
 
-- `WaitForIngestData` **wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is passed as input parameter to the StepFunction by EventBridge script from the previous step and an estimated wait time based on the size of the data to be ingested. This wait time is used to avoid polling the EMR job status too frequently. 
+- `WaitForIngestData` **wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is passed as input parameter to the StepFunction by EventBridge script. This wait time is used to avoid polling the EMR job status too frequently. 
 
 - `GetIngestDataStatus` **task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `describe_job_run` method on the EMR client and passing the virtual cluster ID and the job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the NotifyFailure state.
 
