@@ -162,22 +162,22 @@ emr-app-id
 
 
 ### AWS Data Pipeline with EMR Serverless
-![](aws_data_pipeline.svg)
+![](aws_data_pipeline_drawio.svg)
 
 
 ### The state machine shown below consists of 10 states, each performing a specific task or decision.
 
-![](i/stepfunctions_graph.svg)
+![](stepfunctions_graph.svg)
 
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which is responsible for running the `ingest_data.py` script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a Kafka cluster. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
 
 - `WaitForIngestData` **wait** state pauses the state machine for the specified number of seconds in `$.wait_time` before moving to the next state. `$.wait_time` is passed as input parameter to the StepFunction by EventBridge script. This wait time is used to avoid polling the EMR job status too frequently. 
 
-- `GetIngestDataStatus` **task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `describe_job_run` method on the EMR client and passing the virtual cluster ID and the job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the NotifyFailure state.
+- `GetIngestDataStatus` **task** state triggers a Lambda function `get_ingest_data_status` to retrieve the status of an EMR job by calling `get_job_run` method on the EMR Serverless client and passing job ID. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
 
 - `CheckIngestDataStatus` **choice** state evaluates the status of data ingestion. If it has succeeded, it moves to the `PredictFault` state. If it has failed, it moves to the `NotifyFailure` state. If the status is unknown, it moves back to the `WaitForIngestData` state.
 
-- `PredictFault`, `WaitForPredictFault`, `GetPredictFaultStatus`, `CheckPredictFaultStatus` states repeat the same pattern as the 4 steps above, including submitting the second EMR job to EMR Serverless via lambda function call and monitoring its execution state.
+- `PredictFault`, `WaitForPredictFault`, `GetPredictFaultStatus`, `CheckPredictFaultStatus` states repeat the same pattern as the 4 steps above, including submitting the second Spark job `predict_fault.py` to EMR Serverless via lambda function call and monitoring its execution state.
 
 - `NotifySuccess` **task** state triggers a Lambda function `notify_success` to send a notification about the successful completion of the Spark jobs. 
 
