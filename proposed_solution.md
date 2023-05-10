@@ -162,7 +162,7 @@ emr-app-id
 
 
 ### AWS Data Pipeline with EMR Serverless
-![](aws_data_pipeline_drawio.svg)
+![](aws_data_pipeline.drawio.svg)
 
 
 ### The state machine shown below consists of 10 states, each performing a specific task or decision.
