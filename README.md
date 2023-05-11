@@ -279,7 +279,7 @@ First, we'll explore the ETL and data processing and analytics applications avai
 | EMR Serverless | EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive | - Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need | - Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies |
 
 We can also evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
-
+<!-- 
 <table style="width: 100%;">
   <tr>
     <th style="width: 15%;">Service</th>
@@ -300,7 +300,12 @@ We can also evaluate two workflow orchestration options, namely AWS Step Functio
     <td>- Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</td>
   </tr>
 </table>
+ -->
 
+| Service | Description | Pros | Cons |
+| --- | --- | --- | --- |
+| AWS Step Functions | A fully managed service that lets you coordinate distributed applications and microservices using visual workflows. | - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language).<br/> - Supports both long and short running processes | - Limited to AWS ecosystem.<br/> - May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code. |
+| Amazon Managed Workflows for Apache Airflow | A managed orchestration service for Apache Airflow, an open-source platform to programmatically author, schedule, and monitor workflows | - Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries | - Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month |
 
 <!-- 
 SSM PARAMS
