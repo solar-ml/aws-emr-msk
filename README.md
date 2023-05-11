@@ -271,16 +271,6 @@ We will use structured streaming to consume data from Apache Kafka with a tumbli
 
 First, we'll explore the ETL and data processing and analytics applications available on AWS.
 
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>  
-    
-    
-
-
 <table style="width: 100%;">
   <tr>
     <th style="width: 15%;">Service</th>
