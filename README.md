@@ -316,10 +316,10 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
 
 <table style="width: 100%;">
   <tr>
-    <th style="width: 15%;">Service</th>
-    <th style="width: 20%;">Description</th>
-    <th style="width: 30%;">Pros</th>
-    <th style="width: 35%;">Cons</th>
+    <th style="width: 15%; text-align: center;">Service</th>
+    <th style="width: 20%; text-align: center;">Description</th>
+    <th style="width: 30%; text-align: center;">Pros</th>
+    <th style="width: 35%; text-align: center;">Cons</th>
   </tr>
   <tr>
     <td>AWS Step Functions</td>
@@ -330,7 +330,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
         <li>Easy to visualize and manage workflows<li>
         <li>Integrates with many AWS services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
-        <li>Supports both long and short running processes
+        <li>Supports both long and short running processes</li>
       </ul>
     </td>
     <td>
