@@ -3,6 +3,20 @@
 # Author:  VK
 # Date: 2023-05-05
 
+# Max pooling instead of average pooling, because max pooling may reach a better performance 
+# when you would like to extract the extreme features (abrupt changes) and when the images have 
+# a high pixel density (due to the nine channels).
+# 
+# Rectified linear unit (ReLU) activation function instead of hyperbolic tangent (Tanh) to 
+# overcome the vanish gradient problem, accelerate the training and achieve better performance.
+
+# In order for this model to be functional it must be trained on a labelled data set. 
+# Such a dataset is one where for each device and the four feature matrices obtained after 
+# wavelet transformation, an unambiguous relationship with the type of fault or lack thereof is established.
+
+# Such annotated data sets containing information about solar panels used in PV plants, 
+# sensor readings and corresponding states contain proprietary information and are not publicly available.
+
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Sequential

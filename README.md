@@ -194,7 +194,7 @@ Please consult [Algorithm: Combination of signal processing and convolutional ne
 
 6. Stores the data in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
 
-7. From the `gold' bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults' lambda function that queries the parquet file using the PyArrow library using `deviceID' and returns the JSON result of the prediction.
+7. From the `gold` bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults' lambda function that queries the parquet file using the PyArrow library using `deviceID' and returns the JSON result of the prediction.
 
 The steps above imply use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** libraries to achieve the intended result.
 
@@ -204,7 +204,7 @@ With the Fargate containers, EMR Serverless Application, MSK Serverless Cluster,
 
 At the heart of the workflow is the **AWS StepFunctions** state machine. It orchestrates Spark jobs and handles failures and retries. Its execution is triggered by the event scheduled in the **EventBridge**.
 
-![](aws_data_pipeline.drawio.png)
+![](i/aws_data_pipeline.drawio.png)
 
 
 #### Spark job orchestration and state assessment with StepFunctions
@@ -260,6 +260,7 @@ Cloudwatch Dashboard provides timeline for the following metrics:
 | Executors Metrics | | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
 | Job Metrics | | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
 | Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
+| --- | --- | --- | --- | --- | --- |
 
 
 ## Transition to a streaming application
