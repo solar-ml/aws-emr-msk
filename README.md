@@ -324,13 +324,13 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
   <tr>
     <td>AWS Step Functions</td>
     <td>A fully managed service that lets you coordinate distributed<br/> applications and microservices using visual workflows</td>
-    <td> - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language)<br/> - Supports both long and short running processes</td>
-    <td> - Limited to AWS ecosystem.<br/> - May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code.</td>
+    <td> - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services<br/> - Simple and flexible state language (Amazon States Language)<br/> - Supports both long and short running processes</td>
+    <td> - Limited to AWS ecosystem<br/> - May require custom integrations with non-AWS services<br/> - Workflow language is JSON-based, which can be less expressive than code</td>
   </tr>
   <tr>
     <td>Amazon Managed Workflows for Apache Airflow</td>
-    <td>A managed orchestration service for Apache Airflow<br/>, an open-source platform to programmatically author, schedule, and monitor workflows</td>
-    <td>- Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries</td>
+    <td>A managed orchestration service for Apache Airflow,<br/> an open-source platform to programmatically author, schedule, and monitor workflows</td>
+    <td>- Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code<br> - Large community and existing libraries</td>
     <td>- Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</td>
   </tr>
 </table>
