@@ -14,6 +14,10 @@
 6. [CloudWatch Dashboard for EMR Serverless](#cloudwatch-dashboard-for-emr-serverless)
 7. [Transition to a streaming application](#transition-to-a-streaming-application)
 8. [Exploring alternative data technologies](#exploring-alternative-data-technologies)
+9. Supplementary materials
+    - [Fault Detection and Classification in Photovoltaic Arrays](fault_detection_and_classification.md)
+    - [Wavelet Transformation introduction](wavelet_transform_intro.md)
+    - [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md)
 
 ## Problem description
 
@@ -176,7 +180,7 @@ Then we download JAR files locally, then copy them to a `jars/` subdirectory wit
 
 ## Fault Detection Algorithm Description
 
-Please read [Fault Detection and Classification in Photovoltaic Arrays](<fault_detection_and_classification.md>) and [Wavelet Transformation introduction](<wavelet_transform_intro.md>) if you interested in more information regarding method presented below.
+Please consult [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md) and [Wavelet Transformation introduction](<wavelet_transform_intro.md>) if you interested in more information regarding method presented below.
 
 1. The first script `ingest_data.py` consumes the batch data from the Kafka topic for 24 hours of the previous day using PySpark. We use the `startingTimestamp` and `endingTimestamp` Spark Kafka consumer parameters to filter out messages based on requirement we have.
 
