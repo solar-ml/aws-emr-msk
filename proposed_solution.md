@@ -116,8 +116,8 @@ docker push <account_id>.dkr.ecr.<region>.amazonaws.com/my-emr-serverless-spark:
 The creation of the MSK Serverless Cluster includes the following resources:
 
 1. AWS IAM Role and associated IAM Policy for the Amazon EC2 Kafka client instance;
-2. VPC with at least one public subnet and associated Security Group(s);
-3  We use Fargate on ECS as Apache Kafka client;
+2. VPC with at least one public subnet and associated Security Group(s); ??
+3. We use Fargate on ECS as Apache Kafka client;
 4. Amazon MSK Serverless Cluster;
 
 We  associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
@@ -145,9 +145,9 @@ We create several S3 buckets to facilitate our storage requirements.
 
 ## Algorithm description
 
-1. The first script `ingest_data.py` consumes the batch data from the Kafka topic for 24 hours of the previous day using PySpark. We use the `startingTimestamp` and `endingTimestamp` Spark Kafka consumer parameters to filter out the timestamps we need.
+1. The first script `ingest_data.py` consumes the batch data from the Kafka topic for 24 hours of the previous day using PySpark. We use the `startingTimestamp` and `endingTimestamp` Spark Kafka consumer parameters to filter out messages based on requirement we have.
 
-2. Next, wavelet signal processing, the Continuous Wavelet Transform (CWT), is applied to each of the 4 time series on a per-device basis, using the Morlet mother wavelet with a scale of 64, and then the 2D scalograms are stacked like channels of a color image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 pixel images.
+2. Next, Continuous Wavelet Transform signal processing applied to each of the 4 time series on a per-device basis using the Morlet mother wavelet with a scale of 64. Resulting 2D scalograms are stacked like channels of a color image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 pixel images.
 
 3. It then stores the processed data in a parquet file in the `silver` staging bucket. The Kafka bootstrap server and port, and the location of the silver bucket are obtained from the arguments provided by calling the lambda function. 
 
@@ -157,18 +157,16 @@ We create several S3 buckets to facilitate our storage requirements.
 
 6. Transforms the data into the form required by the neural network and uses the pre-trained CNN model to classify the state of each device into one of six conditions. 
 
-7. The data is then stored in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function. 
+7. The data is then stored in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
 
-8. From the `gold` bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults` lambda function that queries the floor based on `deviceID` and returns the JSON result of the prediction.
+8. From the `gold' bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults' lambda function that queries the parquet file using the PyArrow library using `deviceID' and returns the JSON result of the prediction.
 
-The software requirements of the task therefore implied the use of **PySpark**, **TensorFlow** and **PyWavelets** to achieve the intended result.
+Therefore, the use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** is required to to achieve the intended result.
 
 ## Orchestration approach consideration
 
 At the heart of the workflow is the **AWS StepFunctions** state machine. It orchestrates Spark jobs and handles failures and retries. Its execution is triggered by the event scheduled in the **EventBridge**.
 
-
-### AWS Data Pipeline with EMR Serverless
 ![](aws_data_pipeline.drawio.svg)
 
 
@@ -202,49 +200,20 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 
 ### CloudWatch Dashboard for EMR Serverless
 
-We also deployed CloudWatch Dashboard for Spark applications on EMR Serverless. The CloudWatch Dashboard provides an overview of pre-initialized capacity vs. OnDemand as well as drill-down metrics for CPU, memory, and disk usage for Spark Drivers and Executors. Pre-initialized capacity is an optional feature of EMR Serverless that keeps driver and workers pre-initialized and ready to respond in seconds and this dashboard can help understand if pre-initialized capacity is being used effectively. 
+We also deployed CloudWatch Dashboard for Spark applications on EMR Serverless. The CloudWatch Dashboard provides an overview of pre-initialized capacity vs. OnDemand as well as drill-down metrics for CPU, memory, and disk usage for Spark Drivers and Executors. Pre-initialized capacity is an optional feature of EMR Serverless that keeps driver and workers pre-initialized and ready to respond in seconds and this dashboard can help understand if pre-initialized capacity is being used effectively.  In addition, you can see job-level metrics for the state of your jobs on a per-application basis.
 
-In addition, you can see job-level metrics for the state of your jobs on a per-application basis.
+Cloudwatch Dashboard provides timeline for the following metrics:
 
-Cloudwatch Dashboard provides the following functionality:
+| Group | Description | Metric 1 | Metric 2 | Metric 3 | Metric 4 |
+| --- | --- | --- | --- | --- | --- |
+| Capacity Utilization Snapshot view | Shows current Pre-Initialized vs. OnDemand usage | Pre-Initialized Capacity Worker Utilization % | Available Workers (Drivers + Executors) | Running Drivers | Running Executors |
+| Application | Shows capacity used by your application | Running Workers | CPU Allocated | Memory Allocated | Disk Allocated |
+| Pre-Initialized Capacity | Shows how utilized the pre-initialized capacity is| Total Workers | idle Workers | Pre-Initialized Capacity Worker Utilization % (Workers used / Total Workers) | |
+| Driver Metrics | | Running Drivers | CPU Allocated | Memory Allocated | Disk Allocated  |
+| Executors Metrics | | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
+| Job Metrics | | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
+| Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
 
-- Capacity Utilization Snapshot view - Shows current Pre-Initialized vs. OnDemand usage
-  - Point in time view of Pre-Initialized Capacity Worker Utilization %
-  - Point in time view of Available Workers (Drivers + Executors)
-  - Point in time view of Running Drivers
-  - Point in time view of Running Executors
-
-- Job Runs - Aggregate view of job states for your application per minute
-  - Point in time counters for different states including Pending, Running, and Failed jobs.
-
-- Application Metrics - Shows capacity used by your application
-  - Timeline view of Running Workers
-  - Timeline view of CPU Allocated
-  - Timeline view of Memory Allocated
-  - Timeline view of Disk Allocated
-
-- Pre-Initialized Capacity Metrics - Shows how utilized the pre-initialized capacity is
-  - Timeline view of Total Workers
-  - Timeline view of idle Workers
-  - Timeline view of Pre-Initialized Capacity Worker Utilization % (Workers used / Total Workers)
-
-- Driver Metrics
-  - Timeline view of Running Drivers
-  - Timeline view of CPU Allocated
-  - Timeline view of Memory Allocated
-  - Timeline view of Disk Allocated  
-
-- Executors Metrics
-  - Timeline view of Running Executors
-  - Timeline view of CPU Allocated
-  - Timeline view of Memory Allocated
-  - Timeline view of Disk Allocated  
-
-- Job Metrics
-  - Timeline view of Running Jobs
-  - Timeline view of Success Jobs
-  - Timeline view of Failed Jobs
-  - Timeline view of Cancelled Jobs
 
 **************************************
 
