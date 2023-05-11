@@ -2,30 +2,18 @@
 
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
-
 3. [Architectural choices for data processing](#architectural-choices-for-data-processing)
-
-  3.1 [AWS Fargate on ECS](#aws-fargate-on-ecs)
-
-  3.2 [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
-
-  3.3 [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
-
-  3.4 [VPC Endpoint for S3](#vpc-endpoint-for-s3)
-
-  3.5 [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
-
+  3.1. [AWS Fargate on ECS](#aws-fargate-on-ecs)
+  3.2. [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
+  3.3. [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
+  3.4. [VPC Endpoint for S3](#vpc-endpoint-for-s3)
+  3.5. [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
 4. [Fault Detection Algorithm Description](#fault-detection-algorithm-description)
-
 5. [AWS Data Pipeline Diagram](#aws-data-pipeline)
-
-  5.1 [Spark job orchestration and state assessment with StepFunctions](#spark-job-orchestration-and-state-assessment-with-stepfunctions)
-
-6 [CloudWatch Dashboard for EMR Serverless](#cloudwatch-dashboard-for-emr-serverless)
-
-7 [Transition to a streaming application](#transition-to-a-streaming-application)
-
-8 [Exploring alternative data technologies](#exploring-alternative-data-technologies)
+  5.1. [Spark job orchestration and state assessment with StepFunctions](#spark-job-orchestration-and-state-assessment-with-stepfunctions)
+6. [CloudWatch Dashboard for EMR Serverless](#cloudwatch-dashboard-for-emr-serverless)
+7. [Transition to a streaming application](#transition-to-a-streaming-application)
+8. [Exploring alternative data technologies](#exploring-alternative-data-technologies)
 
 ## Problem description
 
