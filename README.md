@@ -21,9 +21,9 @@
 
 ## Problem description
 
-Electrical faults in photovoltaic (PV) systems may evolve due to several abnormalities in internal configuration. We are presented with the task of **building an early detection and fault classification algorithm that uses the available electrical and environmental measurements from the sensors** deployed by most manufacturers of PV equipment.
+Electrical faults in photovoltaic (PV) systems can occur due to various internal system errors or due to external influences. Our task is to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** used by most PV system manufacturers.
 
-Figure 1 shows a typical PV system configuration consisting of a 5 × 3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical photovoltaic panel problems are shown symbolically.
+Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical PV panel problems are shown symbolically.
 ![](i/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
@@ -32,8 +32,6 @@ Figure 1 shows a typical PV system configuration consisting of a 5 × 3 PV panel
 Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
 
 ## Data size estimate
-<a id="q2"></a>
-
 
 The data represents the electrical and environmental readings of the 10k PV arrays installed in the solar plant system and contains the readings taken by the four sensors, together with the `deviceID` and `timestamp`. The following data is obtained from consuming Amazon Managed Streaming for Apache Kafka (MSK) topic:
 
@@ -49,7 +47,7 @@ schema = StructType([
 ```
 Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the data, we consider the size of each data point and the rate at which they are generated. Suppose the readings from 4 sensors installed on 10,000 solar panels are collected in the SCADA system every 20 seconds and consumed once every 24 hours.
 
-Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB/day of binary efficient non-JSON data, while 100k devices will generate 14.7GB daily.
+Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB/day of binary non-JSON data, while 100k devices will generate 14.7GB daily.
 
 ## Architectural choices for data processing
 
@@ -260,8 +258,6 @@ Cloudwatch Dashboard provides timeline for the following metrics:
 | Executors Metrics | | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
 | Job Metrics | | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
 | Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
-| --- | --- | --- | --- | --- | --- |
-
 
 ## Transition to a streaming application
 
@@ -272,6 +268,24 @@ Structured Streaming is a scalable and fault-tolerant stream processing engine b
 We will use structured streaming to consume data from Apache Kafka with a tumbling event-time window in real time. We will switch from batch to stream reading - from `read()` to `readstream()` and from `write()` to `writestream()`. We then apply the CWT transformation to the data bucketed within this window. The results are fed into a predictive model. The processed dataset, where each device state within a given interval is classified into 6 fault types, is exposed via a web service for use in the analytical dashboard and predictive maintenance reporting. This provides users with fast and granular PV array status updates.
 
 ## Exploring alternative data technologies
+
+First, we'll explore the ETL and data processing and analytics applications available on AWS.
+
+| Service | Description | Pros | Cons |
+| --- | --- | --- | --- |
+| AWS Glue | A serverless data integration service that automates ETL tasks and provides a data catalog. | - Easy to set up and use<br/> - Automatically generates code and metadata<br/> - Integrates with other AWS services<br/> - Support Spark jobs | - More expensive than EMR<br> - Limited worker types and memory<br/> - Less flexible and customizable than EMR<br/> - Dependency size limit is 250MB in total  |
+| AWS Data Pipeline | A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources. | - Easy to create data pipelines using a drag-and-drop console or templates<br/> - Supports scheduling, dependency tracking, error handling, and retry logic for data pipelines<br/> - Low cost and pay per use model | Does not support PySpark or TensorFlow natively<br/> - Less powerful and scalable than EMR or Glue for ETL tasks<br/> - Limited integration with other AWS services compared to EMR or Glue<br/> |
+| EMR on EC2/EKS/Outpost | A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components. | - Complete control over cluster configuration and management<br/> - Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries, etc<br/> - Many supported instance types to choose from<br/> | - Requires more planning, configuration, and scaling of clusters<br/> - More complex and error-prone than serverless options<br/> - May incur higher costs if clusters are not optimized or terminated properly<br/> - You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods |
+| EMR Serverless | EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive | - Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need | - Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies |
+
+We can also evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
+
+| Service | Description | Pros | Cons |
+| --- | --- | --- | --- |
+| AWS Step Functions | A fully managed service that lets you coordinate distributed applications and microservices using visual workflows. | - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language).<br/> - Supports both long and short running processes | - Limited to AWS ecosystem.<br/>2. May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code. |
+| Amazon Managed Workflows for Apache Airflow | A managed orchestration service for Apache Airflow, an open-source platform to programmatically author, schedule, and monitor workflows | 1. Based on a popular open-source platform.<br>2. Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries| - Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month |
+
+
 
 <!-- 
 SSM PARAMS
