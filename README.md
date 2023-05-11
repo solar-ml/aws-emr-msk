@@ -312,14 +312,14 @@ First, we'll explore the ETL and data processing and analytics applications avai
 | EMR on EC2/EKS/Outpost | A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components. | - Complete control over cluster configuration and management<br/> - Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries, etc<br/> - Many supported instance types to choose from<br/> | - Requires more planning, configuration, and scaling of clusters<br/> - More complex and error-prone than serverless options<br/> - May incur higher costs if clusters are not optimized or terminated properly<br/> - You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods |
 | EMR Serverless | EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive | - Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need | - Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies | -->
 
-Next we evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
+Next, we evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
 
 <table style="width: 100%;">
   <tr>
-    <th style="width: 15%;">Service</th>
+    <th style="width: 10%;">Service</th>
     <th style="width: 20%;">Description</th>
     <th style="width: 35%;">Pros</th>
-    <th style="width: 30%;">Cons</th>
+    <th style="width: 35%;">Cons</th>
   </tr>
   <tr>
     <td>AWS Step Functions</td>
