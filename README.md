@@ -279,7 +279,8 @@ First, we'll explore the ETL and data processing and analytics applications avai
 | EMR Serverless | EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive | - Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need | - Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies |
 
 We can also evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
-<!-- 
+
+
 <table style="width: 100%;">
   <tr>
     <th style="width: 15%;">Service</th>
@@ -300,7 +301,7 @@ We can also evaluate two workflow orchestration options, namely AWS Step Functio
     <td>- Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</td>
   </tr>
 </table>
- -->
+ 
 
 | Service | Description | Pros | Cons |
 | --- | --- | --- | --- |
