@@ -276,8 +276,8 @@ First, we'll explore the ETL and data processing and analytics applications avai
   <tr>
     <th style="width: 15%;">Service</th>
     <th style="width: 20%;">Description</th>
-    <th style="width: 35%;">Pros</th>
-    <th style="width: 30%;">Cons</th>
+    <th style="width: 30%;">Pros</th>
+    <th style="width: 35%;">Cons</th>
   </tr>
   <tr>
     <td>AWS Glue</td>
@@ -318,8 +318,8 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
   <tr>
     <th style="width: 15%;">Service</th>
     <th style="width: 20%;">Description</th>
-    <th style="width: 35%;">Pros</th>
-    <th style="width: 30%;">Cons</th>
+    <th style="width: 30%;">Pros</th>
+    <th style="width: 35%;">Cons</th>
   </tr>
   <tr>
     <td>AWS Step Functions</td>
