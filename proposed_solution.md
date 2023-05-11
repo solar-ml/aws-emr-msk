@@ -3,16 +3,14 @@
 Electrical faults in photovoltaic (PV) systems may evolve due to several abnormalities in internal configuration. We are presented with the task of **building an early detection and fault classification algorithm that uses the available electrical and environmental measurements from the sensors** deployed by most manufacturers of PV equipment.
 
 Figure 1 shows a typical PV system configuration consisting of a 5 × 3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical photovoltaic panel problems are shown symbolically.
-
+![](i/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
 </p> -->
 
-![](i/panel_schema.jpg)
+ly each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
 
-Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
-
-### Data size estimate
+## Data size estimate
 
 The data represents the electrical and environmental readings of the 10k PV arrays installed in the solar plant system and contains the readings taken by the four sensors, together with the `deviceID` and `timestamp`. The following data is obtained from consuming Amazon Managed Streaming for Apache Kafka (MSK) topic:
 
@@ -28,7 +26,7 @@ schema = StructType([
 ```
 Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the data, we consider the size of each data point and the rate at which they are generated. Suppose the readings from 4 sensors installed on 10,000 solar panels are collected in the SCADA system every 20 seconds and consumed once every 24 hours.
 
-Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB/day of binary efficient data, obviously not JSON, while 100k devices will generate 14.7GB.
+Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB/day of binary efficient non-JSON data, while 100k devices will generate 14.7GB daily.
 
 ## Architectural choices for data processing
 
@@ -73,7 +71,7 @@ EMR Serverless provides a **pre-initialized capacity** feature that keeps worker
 
 Since we are connecting to MSK Serverless from EMR Serverless, we need to configure VPC access. We need to create VPC and at least two private subnets in different Availability Zones (AZs). According to the documentation, the subnets selected for EMR Serverless must be private subnets. The associated route tables for the subnets should not contain direct routes to the Internet.
 
-Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
+Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR on EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom Docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
 
 1. Create a Dockerfile with the following contents:
 ```
@@ -160,22 +158,22 @@ We create several S3 buckets to facilitate our storage requirements.
 
 6. Transforms the data into the form required by the neural network and uses the pre-trained CNN model to classify the state of each device into one of six conditions. 
 
-7. The data is then stored in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
+7. Stores the data in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
 
 8. From the `gold' bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults' lambda function that queries the parquet file using the PyArrow library using `deviceID' and returns the JSON result of the prediction.
 
-Therefore, the use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** is required to to achieve the intended result.
+The steps above imply use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** libraries to achieve the intended result.
 
 ## AWS Data Pipeline 
 
 At the heart of the workflow is the **AWS StepFunctions** state machine. It orchestrates Spark jobs and handles failures and retries. Its execution is triggered by the event scheduled in the **EventBridge**.
 
-![](aws_data_pipeline.drawio.svg)
+![](aws_data_pipeline.drawio.png)
 
 
-### The state machine shown below consists of 10 states, each performing a specific task or decision.
+#### The state machine consists of 10 states, each performing a specific task or decision.
 
-![](i/stepfunctions_graph.svg)
+![](i/stepfunctions_graph.png)
 
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which gets necessary parameters from Parameter Store and executes the [`ingest_data.py`](<src/lambda/ingest_data_lambda.py>) script from S3 `bootstrap` bucket on an EMR Serverless cluster to obtain data from a MSK cluster. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state.
 
@@ -201,7 +199,7 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 - **Scalability and cost-effectiveness**: The service scales automatically with workload, charging only for what you use, making it a cost-effective choice for managing workflows
 
 
-### CloudWatch Dashboard for EMR Serverless
+## CloudWatch Dashboard for EMR Serverless
 
 We also deployed [CloudWatch Dashboard](<cloudformation/emr_serverless_cloudwatch_dashboard.yaml>) for Spark applications on EMR Serverless. The CloudWatch Dashboard provides an overview of pre-initialized capacity vs. OnDemand as well as drill-down metrics for CPU, memory, and disk usage for Spark Drivers and Executors. Pre-initialized capacity is an optional feature of EMR Serverless that keeps driver and workers pre-initialized and ready to respond in seconds and this dashboard can help understand if pre-initialized capacity is being used effectively.  In addition, you can see job-level metrics for the state of your jobs on a per-application basis.
 
