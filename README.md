@@ -323,15 +323,41 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
   </tr>
   <tr>
     <td>AWS Step Functions</td>
-    <td>A fully managed service that lets you coordinate distributed<br/> applications and microservices using visual workflows</td>
-    <td> - Easy to visualize and manage workflows<br/> - Integrates with many AWS services<br/> - Simple and flexible state language (Amazon States Language)<br/> - Supports both long and short running processes</td>
-    <td> - Limited to AWS ecosystem<br/> - May require custom integrations with non-AWS services<br/> - Workflow language is JSON-based, which can be less expressive than code</td>
+    <td>A fully managed service that lets you coordinate distributed applications 
+    and microservices using visual workflows</td>
+    <td>
+      <ul> 
+        <li>Easy to visualize and manage workflows<li>
+        <li>Integrates with many AWS services</li>
+        <li>Simple and flexible state language (Amazon States Language)</li>
+        <li>Supports both long and short running processes
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Limited to AWS ecosystem</li>
+        <li>May require custom integrations with non-AWS services</li>
+        <li>Workflow language is JSON-based, which can be less expressive than code</li>
+      </ul>
   </tr>
   <tr>
     <td>Amazon Managed Workflows for Apache Airflow</td>
-    <td>A managed orchestration service for Apache Airflow,<br/> an open-source platform to programmatically author, schedule, and monitor workflows</td>
-    <td>- Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code<br> - Large community and existing libraries</td>
-    <td>- Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</td>
+    <td>A managed orchestration service for Apache Airflow, 
+    an open-source platform to programmatically author, schedule, and monitor workflows</td>
+    <td>
+      <ul>
+        <li>Based on a popular open-source platform</li>
+        <li>Supports a wide range of integrations with various services and tools</li>
+        <li>More expressive and flexible workflow definitions using Python code</li>
+        <li>Large community and existing libraries</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>Steeper learning curve compared to Step Functions</li>
+        <li>Requires more hands-on management</li>
+        <li>Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</li>
+      </ul>
   </tr>
 </table>
 
