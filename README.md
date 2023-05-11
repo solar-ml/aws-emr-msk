@@ -324,7 +324,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
   <tr>
     <td>AWS Step Functions</td>
     <td>A fully managed service that lets you coordinate distributed<br/> applications and microservices using visual workflows</td>
-    <td> - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services<br/> - Simple and flexible state language (Amazon States Language)<br/> - Supports both long and short running processes</td>
+    <td> - Easy to visualize and manage workflows<br/> - Integrates with many AWS services<br/> - Simple and flexible state language (Amazon States Language)<br/> - Supports both long and short running processes</td>
     <td> - Limited to AWS ecosystem<br/> - May require custom integrations with non-AWS services<br/> - Workflow language is JSON-based, which can be less expressive than code</td>
   </tr>
   <tr>
