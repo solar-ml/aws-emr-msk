@@ -3,21 +3,21 @@
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
 3. [Architectural choices for data processing](#architectural-choices-for-data-processing)
-    - [AWS Fargate on ECS](#aws-fargate-on-ecs)
-    - [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
-    - [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
-    - [VPC Endpoint for S3](#vpc-endpoint-for-s3)
-    - [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
+    1. [AWS Fargate on ECS](#aws-fargate-on-ecs)
+    2. [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
+    3. [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
+    4. [VPC Endpoint for S3](#vpc-endpoint-for-s3)
+    5. [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
 4. [Fault Detection Algorithm Description](#fault-detection-algorithm-description)
 5. [AWS Data Pipeline Diagram](#aws-data-pipeline)
-    - [Spark job orchestration and state assessment with StepFunctions](#spark-job-orchestration-and-state-assessment-with-stepfunctions)
+    1. [Spark job orchestration and state assessment with StepFunctions](#spark-job-orchestration-and-state-assessment-with-stepfunctions)
 6. [CloudWatch Dashboard for EMR Serverless](#cloudwatch-dashboard-for-emr-serverless)
 7. [Transition to a streaming application](#transition-to-a-streaming-application)
 8. [Exploring alternative data technologies](#exploring-alternative-data-technologies)
 9. Supplementary materials
-    - [Fault Detection and Classification in Photovoltaic Arrays](fault_detection_and_classification.md)
-    - [Wavelet Transformation introduction](wavelet_transform_intro.md)
-    - [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md)
+    1. [Fault Detection and Classification in Photovoltaic Arrays](fault_detection_and_classification.md)
+    2. [Wavelet Transformation introduction](wavelet_transform_intro.md)
+    3. [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md)
 
 ## Problem description
 
@@ -214,8 +214,8 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which gets necessary parameters from Parameter Store and executes the [`ingest_data.py`](<src/lambda/ingest_data_lambda.py>) script from S3 `bootstrap` bucket on an EMR Serverless cluster to consume data from a MSK topic. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state. 
 
 - To submit PySpark job to the EMR Serverless Application, we use the `emr-serverless` API from the AWS SDK.  We will need 4 values: 
-  1. EMR Serverless Application’s `application-id`, 
-  2. the ARN of your EMR Serverless Application’s execution IAM Role, 
+  - (1) EMR Serverless Application’s `application-id`, 
+  - (2) the ARN of your EMR Serverless Application’s execution IAM Role, 
   3. MSK Serverless bootstrap server (host and port), and 
   4. the name of your Amazon S3 Bootstrap bucket containing the Spark resources.
 
