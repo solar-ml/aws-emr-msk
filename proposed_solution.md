@@ -69,17 +69,6 @@ EMR Serverless provides a **pre-initialized capacity** feature that keeps worker
 
 Since we are connecting to MSK Serverless from EMR Serverless, we need to configure VPC access. We need to create VPC and at least two private subnets in different Availability Zones (AZs). According to the documentation, the subnets selected for EMR Serverless must be private subnets. The associated route tables for the subnets should not contain direct routes to the Internet.
 
-### Amazon MSK Serverless Cluster
-
-The creation of the MSK Serverless Cluster includes the following resources:
-
-1. AWS IAM Role and associated IAM Policy for the Amazon EC2 Kafka client instance;
-2. VPC with at least one public subnet and associated Security Group(s);
-3  We use Fargate on ECS as Apache Kafka client;
-4. Amazon MSK Serverless Cluster;
-
-We  associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
-
 Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
 
 1. Create a Dockerfile with the following contents:
@@ -120,6 +109,18 @@ docker push <account_id>.dkr.ecr.<region>.amazonaws.com/my-emr-serverless-spark:
   }
 }
 ```
+
+### Amazon MSK Serverless Cluster
+
+The creation of the MSK Serverless Cluster includes the following resources:
+
+1. AWS IAM Role and associated IAM Policy for the Amazon EC2 Kafka client instance;
+2. VPC with at least one public subnet and associated Security Group(s);
+3  We use Fargate on ECS as Apache Kafka client;
+4. Amazon MSK Serverless Cluster;
+
+We  associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
+
 
 ### VPC Endpoint for S3
 
