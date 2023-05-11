@@ -6,7 +6,9 @@ import boto3
 import pyarrow.parquet as pq
 
 s3 = boto3.resource('s3')
-bucket = s3.Bucket('gold-bucket')
+ssm = boto3.client("ssm")
+gold_bucket = ssm.get_parameter(Name="gold-bucket")["Parameter"]["Value"]
+bucket = s3.Bucket(gold_bucket)
 parquet_file = 'some_file.parquet'
 
 def lambda_handler(event, context):

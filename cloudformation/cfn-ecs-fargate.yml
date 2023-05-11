@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ECS Fargate template.
+Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+  KafkaClientInstanceSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  BearerToken:
+    Type: String
+    Default: Dummy_Token_AAAAAAAAAAAAAAAAAAAAAMLheAAAAAAA0%2BuSeid%2BULvsea4JtiGRiSDSJSI%3DEUifiRBkKG5E2XzMDjRfl76ZC9Ub0wnz4XsNiRVBChTYbJcE3F
+  MskBrokers:
+    Type: String
+    Default: b-1.mskcluster.abc123.a1.kafka.<<region>>.amazonaws.com:9092,b-2.mskcluster.abc123.b2.kafka.<<region>>.amazonaws.com:9092
+  ImageTwitterStreamProducer:
+    Type: String
+    # Update with the Docker image. "You can use images in the Docker Hub registry or specify other repositories (repository-url/image:tag)."
+    Default: <<your_account_number>>.dkr.ecr.<<region>>.amazonaws.com/twitter-stream-producer:latest
+  ImageKafkaStreams:
+    Type: String
+    # Update with the Docker image. "You can use images in the Docker Hub registry or specify other repositories (repository-url/image:tag)."
+    Default: <<your_account_number>>.dkr.ecr.<<region>>.amazonaws.com/kafka-streams-msk:latest
+  ServiceName1:
+    Type: String
+    Default: twitter-stream-producer
+    AllowedValues: [twitter-stream-producer]
+  ServiceName2:
+    Type: String
+    Default: kafka-streams-msk
+    AllowedValues: [kafka-streams-msk]
+
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: MSK-Fargate-Demo
+
+  TaskDefinition1:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: LogGroup1
+    Properties:
+      Family: !Join ['', [!Ref ServiceName1, TaskDefinition1]]
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 2048
+      Memory: 4GB
+      ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !Ref TaskRole
+      ContainerDefinitions:
+        - Name: !Ref ServiceName1
+          Image: !Ref ImageTwitterStreamProducer
+          Environment:
+            - Name: JAVA_TOOL_OPTIONS
+              Value: !Join ['', ['-Dkafka.broker=', !Ref MskBrokers, ' -Dbearer.token=', !Ref BearerToken]]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup1
+              awslogs-stream-prefix: ecs
+
+  TaskDefinition2:
+    Type: AWS::ECS::TaskDefinition
+    DependsOn: LogGroup2
+    Properties:
+      Family: !Join ['', [!Ref ServiceName2, TaskDefinition2]]
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 2048
+      Memory: 4GB
+      ExecutionRoleArn: !Ref ExecutionRole
+      TaskRoleArn: !Ref TaskRole
+      ContainerDefinitions:
+        - Name: !Ref ServiceName2
+          Image: !Ref ImageKafkaStreams
+          Environment:
+            - Name: JAVA_TOOL_OPTIONS
+              Value: !Join ['', ['-Dkafka.broker=', !Ref MskBrokers]]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup2
+              awslogs-stream-prefix: ecs
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "AmazonECSTaskExecutionRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:  "AWSFargateServiceTaskRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'
+
+  Service1:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Ref ServiceName1
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition1
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref PrivateSubnet1
+            - !Ref PrivateSubnet2
+          SecurityGroups:
+            - !Ref KafkaClientInstanceSecurityGroupId
+
+  Service2:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Ref ServiceName2
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition2
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      DesiredCount: 3
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - !Ref PrivateSubnet1
+            - !Ref PrivateSubnet2
+          SecurityGroups:
+            - !Ref KafkaClientInstanceSecurityGroupId
+
+  LogGroup1:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [/ecs/, !Ref ServiceName1, TaskDefinition1]]
+
+  LogGroup2:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [ /ecs/, !Ref ServiceName2, TaskDefinition2]]
