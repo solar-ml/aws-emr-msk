@@ -200,6 +200,51 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 - **Scalability and cost-effectiveness**: The service scales automatically with workload, charging only for what you use, making it a cost-effective choice for managing workflows
 
 
+### CloudWatch Dashboard for EMR Serverless
+
+We also deployed CloudWatch Dashboard for Spark applications on EMR Serverless. The CloudWatch Dashboard provides an overview of pre-initialized capacity vs. OnDemand as well as drill-down metrics for CPU, memory, and disk usage for Spark Drivers and Executors. Pre-initialized capacity is an optional feature of EMR Serverless that keeps driver and workers pre-initialized and ready to respond in seconds and this dashboard can help understand if pre-initialized capacity is being used effectively. 
+
+In addition, you can see job-level metrics for the state of your jobs on a per-application basis.
+
+Cloudwatch Dashboard provides the following functionality:
+
+- Capacity Utilization Snapshot view - Shows current Pre-Initialized vs. OnDemand usage
+  - Point in time view of Pre-Initialized Capacity Worker Utilization %
+  - Point in time view of Available Workers (Drivers + Executors)
+  - Point in time view of Running Drivers
+  - Point in time view of Running Executors
+
+- Job Runs - Aggregate view of job states for your application per minute
+  - Point in time counters for different states including Pending, Running, and Failed jobs.
+
+- Application Metrics - Shows capacity used by your application
+  - Timeline view of Running Workers
+  - Timeline view of CPU Allocated
+  - Timeline view of Memory Allocated
+  - Timeline view of Disk Allocated
+
+- Pre-Initialized Capacity Metrics - Shows how utilized the pre-initialized capacity is
+  - Timeline view of Total Workers
+  - Timeline view of idle Workers
+  - Timeline view of Pre-Initialized Capacity Worker Utilization % (Workers used / Total Workers)
+
+- Driver Metrics
+  - Timeline view of Running Drivers
+  - Timeline view of CPU Allocated
+  - Timeline view of Memory Allocated
+  - Timeline view of Disk Allocated  
+
+- Executors Metrics
+  - Timeline view of Running Executors
+  - Timeline view of CPU Allocated
+  - Timeline view of Memory Allocated
+  - Timeline view of Disk Allocated  
+
+- Job Metrics
+  - Timeline view of Running Jobs
+  - Timeline view of Success Jobs
+  - Timeline view of Failed Jobs
+  - Timeline view of Cancelled Jobs
 
 **************************************
 
