@@ -274,16 +274,38 @@ First, we'll explore the ETL and data processing and analytics applications avai
 | Service | Description | Pros | Cons |
 | --- | --- | --- | --- |
 | AWS Glue | A serverless data integration service that automates ETL tasks and provides a data catalog. | - Easy to set up and use<br/> - Automatically generates code and metadata<br/> - Integrates with other AWS services<br/> - Support Spark jobs | - More expensive than EMR<br> - Limited worker types and memory<br/> - Less flexible and customizable than EMR<br/> - Dependency size limit is 250MB in total  |
-| AWS Data Pipeline | A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources. | - Easy to create data pipelines using a drag-and-drop console or templates<br/> - Supports scheduling, dependency tracking, error handling, and retry logic for data pipelines<br/> - Low cost and pay per use model | Does not support PySpark or TensorFlow natively<br/> - Less powerful and scalable than EMR or Glue for ETL tasks<br/> - Limited integration with other AWS services compared to EMR or Glue<br/> |
+| AWS Data Pipeline | A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources. | - Easy to create data pipelines using a drag-and-drop console or templates<br/> - Supports scheduling, dependency tracking, error handling, and retry logic for data pipelines<br/> - Low cost and pay per use model | - Does not support PySpark or TensorFlow natively<br/> - Less powerful and scalable than EMR or Glue for ETL tasks<br/> - Limited integration with other AWS services compared to EMR or Glue<br/> |
 | EMR on EC2/EKS/Outpost | A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components. | - Complete control over cluster configuration and management<br/> - Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries, etc<br/> - Many supported instance types to choose from<br/> | - Requires more planning, configuration, and scaling of clusters<br/> - More complex and error-prone than serverless options<br/> - May incur higher costs if clusters are not optimized or terminated properly<br/> - You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods |
 | EMR Serverless | EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive | - Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need | - Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies |
 
 We can also evaluate two workflow orchestration options, namely AWS Step Functions and Amazon Managed Workflows for Apache Airflow:
 
+<table style="width: 100%;">
+  <tr>
+    <th style="width: 20%;">Service</th>
+    <th style="width: 20%;">Description</th>
+    <th style="width: 30%;">Pros</th>
+    <th style="width: 30%;">Cons</th>
+  </tr>
+  <tr>
+    <td>AWS Step Functions</td>
+    <td>A fully managed service that lets you coordinate distributed applications and microservices using visual workflows</td>
+    <td> - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language).<br/> - Supports both long and short running processes</td>
+    <td> - Limited to AWS ecosystem.<br/> - May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code.</td>
+  </tr>
+  <tr>
+    <td>Amazon Managed Workflows for Apache Airflow</td>
+    <td>A managed orchestration service for Apache Airflow, an open-source platform to programmatically author, schedule, and monitor workflows</td>
+    <td>- Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries</td>
+    <td>- Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month</td>
+  </tr>
+</table>
+
+<!-- 
 | Service | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| AWS Step Functions | A fully managed service that lets you coordinate distributed applications and microservices using visual workflows. | - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language).<br/> - Supports both long and short running processes | - Limited to AWS ecosystem.<br/>2. May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code. |
-| Amazon Managed Workflows for Apache Airflow | A managed orchestration service for Apache Airflow, an open-source platform to programmatically author, schedule, and monitor workflows | 1. Based on a popular open-source platform.<br>2. Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries| - Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month |
+| AWS Step Functions | A fully managed service that lets you coordinate distributed applications and microservices using visual workflows. | - Easy to visualize and manage workflows.<br/> - Integrates with many AWS services.<br/> - Simple and flexible state language (Amazon States Language).<br/> - Supports both long and short running processes | - Limited to AWS ecosystem.<br/> - May require custom integrations with non-AWS services.<br/> - Workflow language is JSON-based, which can be less expressive than code. |
+| Amazon Managed Workflows for Apache Airflow | A managed orchestration service for Apache Airflow, an open-source platform to programmatically author, schedule, and monitor workflows | - Based on a popular open-source platform.<br> - Supports a wide range of integrations with various services and tools.<br> - More expressive and flexible workflow definitions using Python code.<br> - Large community and existing libraries | - Steeper learning curve compared to Step Functions.<br> - Requires more hands-on management<br> - Service can be quite costly to operate, even when idle, with smallest Environment class potentially running into the hundreds of dollars per month | -->
 
 
 
