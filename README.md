@@ -271,6 +271,15 @@ We will use structured streaming to consume data from Apache Kafka with a tumbli
 
 First, we'll explore the ETL and data processing and analytics applications available on AWS.
 
+      <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>  
+    
+    
+
 
 <table style="width: 100%;">
   <tr>
@@ -282,28 +291,80 @@ First, we'll explore the ETL and data processing and analytics applications avai
   <tr>
     <td>AWS Glue</td>
     <td>A serverless data integration service that automates ETL tasks and provides a data catalog</td>
-    <td> - Easy to set up and use<br/> - Automatically generates code and metadata<br/> - Integrates with other AWS services<br/> - Support Spark jobs</td>
-    <td> - More expensive than EMR<br> - Limited worker types and memory<br/> - Less flexible and customizable than EMR<br/> - Dependency size limit is 250MB in total</td>
+    <td>
+      <ul>
+        <li>Easy to set up and use</li>
+        <li>Automatically generates code and metadata</li>
+        <li>Integrates with other AWS services</li>
+        <li>Support Spark jobs</li>
+      </ul> 
+    </td> 
+    <td>
+      <ul>
+        <li>More expensive than EMR</li>
+        <li>Limited worker types and memory</li>
+        <li>Less flexible and customizable than EMR</li>
+        <li>Dependency size limit is 250MB in total</li>
+      </ul>  
+    </td>
   </tr>
   <tr>
     <td>AWS Data Pipeline</td>
     <td>A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources</td>
-    <td>- Easy to create data pipelines using a drag-and-drop console or templates<br/> - Supports scheduling, dependency tracking, error handling, and retry logic for data pipelines<br/> - Low cost and pay per use model</td>
-    <td>- Does not support PySpark or TensorFlow natively<br/> - Less powerful and scalable than EMR or Glue for ETL tasks<br/> - Limited integration with other AWS services compared to EMR or Glue<br/></td>
+    <td>
+      <ul>
+        <li>Easy to create data pipelines using a drag-and-drop console or templates</li>
+        <li>Supports scheduling, dependency tracking, error handling, and retry logic for data pipelines</li>
+        <li>Low cost and pay per use model</li>
+      </ul>  
+    </td>
+    <td>
+      <ul>
+        <li>Does not support PySpark or TensorFlow natively</li>
+        <li>Less powerful and scalable than EMR or Glue for ETL tasks</li>
+        <li>Limited integration with other AWS services compared to EMR or Glue</li>
+      </ul>  
+    </td>
   </tr>
   <tr>
     <td>EMR on EC2/EKS/Outpost</td>
     <td>A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components</td>
-    <td> - Complete control over cluster configuration and management<br/> - Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries, etc<br/> - Many supported instance types to choose from<br/></td>
-    <td> - Requires more planning, configuration, and scaling of clusters<br/> - More complex and error-prone than serverless options<br/> - May incur higher costs if clusters are not optimized or terminated properly<br/> - You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods </td>
+    <td>
+      <ul>
+        <li>Complete control over cluster configuration and management</li>
+        <li>Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries</li>
+        <li>Many supported instance types to choose from</li>
+      </ul>  
+    </td>
+    <td>
+      <ul>
+        <li>Requires more planning, configuration, and scaling of clusters</li>
+        <li>More complex and error-prone than serverless options</li>
+        <li>May incur higher costs if clusters are not optimized or terminated properly</li>
+        <li>You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak</li>
+      </ul>  
+    </td>
   </tr>
   <tr>
     <td>EMR Serverless</td>
     <td>EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive</td>
-    <td>- Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs<br/> - Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need</td>
-    <td>- Limited application support: have only Spark or Hive<br/> - User needs to build and push custom images to ECR<br/> - It is critical to choose the correct version of each JAR dependencies</td>
+    <td>
+      <ul>
+        <li>Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads</li>
+        <li>You are not billed for idle time between jobs</li>
+        <li>Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need</li>
+      </ul>  
+    </td>
+    <td>
+      <ul>
+        <li>Limited application support: have only Spark or Hive</li>
+        <li>User needs to build and push custom images to ECR</li>
+        <li>It is critical to choose the correct version of each JAR dependencies</li>
+      </ul>  
+    </td>
   </tr>
   </table>
+
 <!-- 
 | Service | Description | Pros | Cons |
 | --- | --- | --- | --- |
@@ -327,7 +388,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     and microservices using visual workflows</td>
     <td>
       <ul> 
-        <li>Easy to visualize and manage workflows<li>
+        <li>Easy to visualize and manage workflows</li>
         <li>Integrates with many AWS services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
         <li>Supports both long and short running processes</li>
