@@ -39,6 +39,8 @@ Later, we will talk about the reasons for picking this services and compare them
 
 ECS cluster with a Fargate task is a serverless container orchestration solution that enables us to deploy, manage, and scale containerized applications without the need to manage the underlying infrastructure. We define your application's container requirements in a task definition, create an ECS service to run and maintain the tasks, and Fargate handles the rest.
 
+The primary task of the Kafka client container application deployed in ECS is to retrieve, parse data and publish messages to the Amazon MSK topic.
+
 We start by creating a container image containing Apache Kafka Streams API files and our custom scripts. These scripts will retrieve the data from the remote SCADA system, apply parsing and use Kafka Producer APIs to publish messages to the Amazon MSK topic. The topic is partitioned by `key=deviceID`, which is the serial number of the photovoltaic panel. The data in the message field of the topic is stored using the efficient AVRO format. The published data includes the readings taken by the `voltage`, `current`, `temperature` and `irradiance` sensors, together with the `deviceID` and `timestamp`.
 
 We create a Docker image `kafka-streams-msk` based on `adoptopenjdk/openjdk11:jre-11.0.10_9-alpine` and include the *.jar files required by Kafka. 
@@ -53,7 +55,6 @@ docker push <<account_id>>.dkr.ecr.<<region>>.amazonaws.com/kafka-streams-msk:la
 
 Next we use CloudFormation template to create ECS cluster, Fargate task, and service definitions.  When the CloudFormation stack is complete, it automatically deploys our applications. 
 
-As we mentioned earlier, the primary task of the container application is to retrieve data from the remote SCADA system, apply parsing, and use the Kafka Producer APIs to publish messages to the Amazon MSK topic. 
 
 ### Amazon EMR Serverless Application
 
