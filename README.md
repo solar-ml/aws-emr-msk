@@ -316,7 +316,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
 
 <table style="width: 100%;">
   <tr>
-    <th style="width: 10%;">Service</th>
+    <th style="width: 15%;">Service</th>
     <th style="width: 20%;">Description</th>
     <th style="width: 35%;">Pros</th>
     <th style="width: 35%;">Cons</th>
