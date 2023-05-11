@@ -1,5 +1,4 @@
 ## Fault Detection and Classification in Photovoltaic Arrays
-#solar_pipeline
 
 <p align="center"> <img src="i/solar_plant_desert.jpg" /> </p>
 <!--![](i/solar_plant_desert.jpg) -->
