@@ -8,7 +8,7 @@ The Wavelet Transform (WT) is considered to be a more powerful and preferred met
 
 The different wavelet shapes enable us to choose the one that fits best with the features that we are looking for in our signal. Most common wavelets for CWT are the "Mexican, Morlet and Gaussian" wavelet (Figure 1). They are also called "**Mother Wavelets**".
 
-![](i/wavelet_types.jpg)
+![](img/wavelet_types.jpg)
 Consequently, the wavelet transformation uses the mother wavelets to divide a 1D to ND time series or image into scaled components. In this connection, the transformation is based on the concepts of scaling and shifting.
 
 - Scaling: stretching or shrinking the signal in time by the scaling factor.
@@ -16,7 +16,7 @@ Consequently, the wavelet transformation uses the mother wavelets to divide a 1D
 
 The scale factor corresponds to how much a signal is scaled in time and it is inversely proportional to frequency. This means that the higher the scale, the finer the scale discretion (Figure 2).
 
-![](i/wavelet_scales.webp)
+![](img/wavelet_scales.webp)
 Accordingly, this helps:
 
 - stretched wavelets to capture slow changes; and
@@ -25,7 +25,7 @@ Accordingly, this helps:
 The different wavelets in scales and time are shifted along the entire signal and multiplied by its sampling interval to obtain physical significances, resulting in coefficients that are a function of wavelet scales and shift parameters. For example, a signal with 100 timesteps multiplied by 32 (in a range from 1 to 33) scales results in 3,200 coefficients. This enables better characterizing oscillated behavior in signals with CWT.
 
 If we apply CWT to non-stationary signal and visualize the resulting coefficients in a scalogram, we obtain the following result:
-![](i/wavelets_3.jpg)
+![](img/wavelets_3.jpg)
 The scalogram above (Figure 3) indicates where most of the energy (see the color bar right of the scalogram) of the original signal is contained in time and frequency. Furthermore, we can see that the characteristics of the signal are now displayed in highly resolved detail. Thereby, you can see the abrupt changes of the burst that are detected by the shrink wavelet with the scale 1 and 2 and the slow changes of the sinus wave by stretched wavelets with a scale of 15 up to 25.
 
 **The abrupt changes are often the most important part of the data both perceptibly and in terms of the information that they provide.**
@@ -36,11 +36,11 @@ For instance, Human Activity Recognition (HAR) dataset contains a smartphone sen
 
 If you plot the body accelerometer and body gyroscope signals of two different activities, you will see dynamically changing (non-stationary) signals for each sample:
 
-![](i/wavelets_4.jpg)
+![](img/wavelets_4.jpg)
 Once processed with CWT, as you can see below, it is possible to manually distinguish between the different six HAR activities by visualising the continuous wavelet transformed sensor data via a scalogram.
 
-![](i/wavelets_5.jpg)
+![](img/wavelets_5.jpg)
 
 
 
-![](i/wavelets_6.jpg)
+![](img/wavelets_6.jpg)

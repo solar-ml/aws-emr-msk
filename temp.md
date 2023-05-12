@@ -40,7 +40,7 @@ Although Glue supports third-party Python libraries, which you can install using
 AWS Data Pipeline is a service designed for data-driven workflows, supporting data movement and transformation, integrating with AWS services like S3, RDS, and EMR, offering scheduling capabilities and dependency tracking, but requiring manual error handling and retries. If the data source you need is not supported, or if you want to perform an activity that is not integrated, you will have to hack your way around with shell scripts.
 
 ### Amazon EMR on EC2/EKS or EMR Serverless
-![](i/Arch_Amazon-EMR_64.png)
+![](img/Arch_Amazon-EMR_64.png)
 
 | AWS Glue | EMR Serverless |
 | --- | --- |
@@ -53,17 +53,3 @@ Running EMR Serverless can be less expensive and faster than creating and termin
 1. Pay-per-use pricing: With EMR Serverless, you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads. You are not billed for idle time between jobs.
 
 2. Resource allocation and scaling: EMR Serverless automatically scales resources based on workload, ensuring you only pay for what you need. In contrast, with EMR on EC2, you may need to over-provision resources to handle peak workloads or under-provision resources during off-peak periods.
-
-
-
-
-
-SSM PARAMS
-
-kafka-servers
-kafka-topics
-sns-topic
-log-bucket
-silver-bucket
-gold-bucket
-emr-app-id

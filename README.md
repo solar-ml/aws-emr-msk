@@ -24,7 +24,7 @@
 Electrical faults in photovoltaic (PV) systems can occur due to various internal system errors or due to external influences. Our task is to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** used by most PV system manufacturers.
 
 Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical PV panel problems are shown symbolically.
-![](i/panel_schema.jpg)
+![](img/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
 </p> -->
@@ -91,11 +91,11 @@ EMR Serverless provides a **pre-initialized capacity** feature that keeps worker
 
 Since we are connecting to MSK Serverless from EMR Serverless, we need to configure VPC access. We need to create VPC and at least two private subnets in different Availability Zones (AZs). According to the documentation, the subnets selected for EMR Serverless must be private subnets. The associated route tables for the subnets should not contain direct routes to the Internet.
 
-Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR on EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom Docker image based on the existing `emr-serverless/spark/emr-6.9.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
+Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR on EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom Docker image based on the existing `emr-serverless/spark/emr-6.7.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
 
 1. Create a Dockerfile with the following contents:
 ```
-FROM public.ecr.aws/emr-serverless/spark/emr-6.9.0:latest
+FROM public.ecr.aws/emr-serverless/spark/emr-6.7.0:latest
 
 USER root
 
@@ -202,12 +202,12 @@ With the Fargate containers, EMR Serverless Application, MSK Serverless Cluster,
 
 At the heart of the workflow is the **AWS StepFunctions** state machine. It orchestrates Spark jobs and handles failures and retries. Its execution is triggered by the event scheduled in the **EventBridge**.
 
-![](i/aws_data_pipeline.drawio.png)
+![](img/aws_data_pipeline.drawio.png)
 
 
 #### Spark job orchestration and state assessment with StepFunctions
 
-![](i/stepfunctions_graph.png)
+![](img/stepfunctions_graph.png)
 
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which gets necessary parameters from Parameter Store and executes the [`ingest_data.py`](<src/lambda/ingest_data_lambda.py>) script from S3 `bootstrap` bucket on an EMR Serverless cluster to consume data from a MSK topic. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state. 
 
@@ -253,11 +253,13 @@ Cloudwatch Dashboard provides timeline for the following metrics:
 | --- | --- | --- | --- | --- | --- |
 | Capacity Utilization Snapshot view | Shows current Pre-Initialized vs. OnDemand usage | Pre-Initialized Capacity Worker Utilization % | Available Workers (Drivers + Executors) | Running Drivers | Running Executors |
 | Application | Shows capacity used by your application | Running Workers | CPU Allocated | Memory Allocated | Disk Allocated |
-| Pre-Initialized Capacity | Shows how utilized the pre-initialized capacity is| Total Workers | idle Workers | Pre-Initialized Capacity Worker Utilization % (Workers used / Total Workers) | |
-| Driver Metrics | | Running Drivers | CPU Allocated | Memory Allocated | Disk Allocated  |
-| Executors Metrics | | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
-| Job Metrics | | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
+| Pre-Initialized Capacity | Indicates how much of the pre-initialized capacity is being used | Total Workers | idle Workers | Pre-Initialized Capacity Worker Utilization % (Workers used / Total Workers) | |
+| Driver Metrics | Tracks efficiency and resource utilization of drivers | Running Drivers | CPU Allocated | Memory Allocated | Disk Allocated  |
+| Executors Metrics | Measures performance and usage of executors | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
+| Job Metrics | Provides insights into job performance and efficiency | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
 | Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
+
+Shows how utilized the pre-initialized capacity is
 
 ## Transition to a streaming application
 
@@ -269,17 +271,17 @@ We will use structured streaming to consume data from Apache Kafka with a tumbli
 
 ## Exploring alternative data technologies
 
-First, we'll explore the ETL and data processing and analytics applications available on AWS.
+There are two main components of this solution: data processing and workflow orchestration. AWS offers many services that are well suited for ETL tasks. Each service has its own unique features, strengths and limitations, as well as overlapping functionality. We shall give a brief overview and choose those that fit best in our particular case.  First, we'll explore the ETL and data processing and analytics applications available on AWS.
 
 <table style="width: 100%;">
   <tr>
-    <th style="width: 15%;">Service</th>
-    <th style="width: 20%;">Description</th>
-    <th style="width: 30%;">Pros</th>
-    <th style="width: 35%;">Cons</th>
+    <th style="width: 15%; text-align: center;">Service</th>
+    <th style="width: 20%; text-align: center;">Description</th>
+    <th style="width: 30%; text-align: center;">Pros</th>
+    <th style="width: 35%; text-align: center;">Cons</th>
   </tr>
   <tr>
-    <td>AWS Glue</td>
+    <td><b>AWS Glue</b></td>
     <td>A serverless data integration service that automates ETL tasks and provides a data catalog</td>
     <td>
       <ul>
@@ -299,7 +301,7 @@ First, we'll explore the ETL and data processing and analytics applications avai
     </td>
   </tr>
   <tr>
-    <td>AWS Data Pipeline</td>
+    <td><b>AWS Data Pipeline</b></td>
     <td>A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources</td>
     <td>
       <ul>
@@ -317,7 +319,7 @@ First, we'll explore the ETL and data processing and analytics applications avai
     </td>
   </tr>
   <tr>
-    <td>EMR on EC2/EKS/Outpost</td>
+    <td><b>EMR on EC2/EKS/Outpost</b></td>
     <td>A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components</td>
     <td>
       <ul>
@@ -336,13 +338,14 @@ First, we'll explore the ETL and data processing and analytics applications avai
     </td>
   </tr>
   <tr>
-    <td>EMR Serverless</td>
+    <td><b>EMR Serverless</b></td>
     <td>EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive</td>
     <td>
       <ul>
         <li>Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads</li>
         <li>You are not billed for idle time between jobs</li>
-        <li>Resource allocation and scaling: automatically scales resources based on workload, ensuring you only pay for what you need</li>
+        <li>Resource allocation and scaling: automatically scales resources based on workload</li>
+        <li>Provides a pre-initialized capacity feature that keeps workers initialized and ready to respond in seconds</li>
       </ul>  
     </td>
     <td>
@@ -350,6 +353,7 @@ First, we'll explore the ETL and data processing and analytics applications avai
         <li>Limited application support: have only Spark or Hive</li>
         <li>User needs to build and push custom images to ECR</li>
         <li>It is critical to choose the correct version of each JAR dependencies</li>
+        <li>Creates an elastic network interface for each worker, thereby increasing costs</li>
       </ul>  
     </td>
   </tr>
@@ -373,7 +377,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     <th style="width: 35%; text-align: center;">Cons</th>
   </tr>
   <tr>
-    <td>AWS Step Functions</td>
+    <td><b>AWS Step Functions</b></td>
     <td>A fully managed service that lets you coordinate distributed applications 
     and microservices using visual workflows</td>
     <td>
@@ -392,7 +396,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
       </ul>
   </tr>
   <tr>
-    <td>Amazon Managed Workflows for Apache Airflow</td>
+    <td><b>Amazon Managed Workflows for Apache Airflow</b></td>
     <td>A managed orchestration service for Apache Airflow, 
     an open-source platform to programmatically author, schedule, and monitor workflows</td>
     <td>

@@ -1,14 +1,14 @@
 ## Fault Detection and Classification in Photovoltaic Arrays
 
 <p align="center"> <img src="i/solar_plant_desert.jpg" /> </p>
-<!--![](i/solar_plant_desert.jpg) -->
+<!--![](img/solar_plant_desert.jpg) -->
 
 Renewable energy already accounts for a large part of the energy market. In recent decades, solar photovoltaic (PV) energy has rapidly captured a large number of markets due to its global availability, modularity, non-pollution, ease of installation, and affordability. Much progress has been made in the study of PV systems, especially in terms of efficiency, cost, and obtaining maximum available power from PV cells. Nevertheless, PV systems are often subject to a variety of types of faults, which can seriously affect the safe operation and conversion efficiency of the systems
 
 The Energy Audit Report shows an annual energy loss of up to 18.9% due to PV system faults in the UK alone. Furthermore, the fault diagnosis of PV systems also yields numerous economic benefits. Therefore, it is necessary to focus attention on this task.
 
 Faults in photovoltaic (PV) systems are mainly PV system component faults, which originate from dirty modules, sand or snow cover, local shading, module aging, and basic component manufacturing. The typical faults that occur in PV systems are shown in Figure 1, and can be divided into three types, namely, **physical**, **chemical**, and **electrical** faults.
-![](i/fault_types_solar_panel.jpg)
+![](img/fault_types_solar_panel.jpg)
 
 To investigate and mitigate the aforementioned faults, National Electric Code (NEC) recommends the use of Ground Fault Protection Device, Over Current Protection Device and arc Fault Circuit Interrupter to detect Line-Line, Line-Ground and Arc faults respectively. However, the incompatibility of such protection devices is portrayed in comprehensive studies. 
 
