@@ -1,6 +1,6 @@
 /backup/
 .DS_Store
-.bkp
+*.bkp
 *.drawio
 interview.md
 temp.md
