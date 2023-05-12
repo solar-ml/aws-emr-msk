@@ -390,7 +390,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     </td>
     <td>
       <ul>
-        <li>Limited to AWS ecosystem</li>
+        <li>Limited&nbsp;to&nbsp;AWS ecosystem</li>
         <li>May require custom integrations with non-AWS services</li>
         <li>Workflow language is JSON-based, which can be less expressive than code</li>
       </ul>
