@@ -10,7 +10,7 @@ As opposed to Fast Fourier Transform (FFT) which only provides frequency informa
 
 The result of applying CWT to time series data are 2D matrices called "scalograms". The level of details is controlled by the "scale" parameter. The scale factor corresponds to how much a signal is scaled in time and is inversely proportional to frequency.
 
-On figure 2 Visualization of ‘‘average scalograms’’ for six fault classes.
+On figure 1 Visualization of ‘‘average scalograms’’ for six fault classes.
 
 <p align="center">
   <img src="img/scalo_vis.jpg" width="65%"/>

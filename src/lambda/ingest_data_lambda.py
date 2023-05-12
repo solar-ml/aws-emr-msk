@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     #     return response.get("jobRun")
 
     ssm = boto3.client("ssm")
-    bootstrap_servers = ssm.get_parameter(Name="bootstrap-servers ")["Parameter"]["Value"]
+    bootstrap_servers = ssm.get_parameter(Name="bootstrap-servers")["Parameter"]["Value"]
     read_topic = ssm.get_parameter(Name="read-topic")["Parameter"]["Value"]
 
     # EMR Serverless application is created beforehand and re-used between the steps

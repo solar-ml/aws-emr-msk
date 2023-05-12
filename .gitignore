@@ -1,4 +1,4 @@
-# ignore .DS_Store
+/backup/
 .DS_Store
 .bkp
 *.drawio

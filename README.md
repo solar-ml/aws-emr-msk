@@ -33,7 +33,7 @@ Normally each panel of the PV system is equipped with four sensors, namely: `vol
 
 ## Data size estimate
 
-The data represents the electrical and environmental readings of the 10k PV arrays installed in the solar plant system and contains the readings taken by the four sensors, together with the `deviceID` and `timestamp`. The following data is obtained from consuming Amazon Managed Streaming for Apache Kafka (MSK) topic:
+The data represents the electrical and environmental readings of the 10k PV arrays installed in the solar plant system and contains the readings taken by the four sensors, together with the `deviceID` and `timestamp`. Below is a schema of messages obtained from consumption of Amazon Managed Streaming for Apache Kafka (MSK) topic in PySpark:
 
 ```python
 schema = StructType([
@@ -47,11 +47,13 @@ schema = StructType([
 ```
 Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the data, we consider the size of each data point and the rate at which they are generated. Suppose the readings from 4 sensors installed on 10,000 solar panels are collected in the SCADA system every 20 seconds and consumed once every 24 hours.
 
-Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB/day of binary non-JSON data, while 100k devices will generate 14.7GB daily.
+Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB per day of binary data, while 100k devices will generate 14.7GB daily.
 
 ## Architectural choices for data processing
 
 According to the requirements of this task, data is fetched in daily batches. Each batch includes sensor readings from the SCADA system for the day preceding the day of the moment of pipeline execution.
+
+Recommended in cases where the throughput requirements of client applications are variable and hard to predict. MSK Serverless scales cluster capacity automatically in response to throughput needs.
 
 Based on these inputs, we decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. We will also be using AWS Fargate in Elastic Container Services (ECS). 
 
@@ -172,6 +174,9 @@ wget https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.11.1/comm
 wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.8.1/kafka-clients-2.8.1.jar
 wget https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.2.1/spark-sql-kafka-0-10_2.12-3.2.1.jar
 wget https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.2.1/spark-token-provider-kafka-0-10_2.12-3.2.1.jar
+
+# optional dependencies for avro-format messages
+wget https://repo1.maven.org/maven2/org/apache/spark/spark-avro_2.12/3.2.1/spark-avro_2.12-3.2.1.jar
 ```
 Then we download JAR files locally, then copy them to a `jars/` subdirectory within S3 Bootstrap bucket.
 
@@ -202,8 +207,9 @@ With the Fargate containers, EMR Serverless Application, MSK Serverless Cluster,
 
 At the heart of the workflow is the **AWS StepFunctions** state machine. It orchestrates Spark jobs and handles failures and retries. Its execution is triggered by the event scheduled in the **EventBridge**.
 
-![](img/aws_data_pipeline.drawio.png)
+![](img/aws_data_pipeline_2.svg)
 
+[PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipeline_2.svg) [PDF](img/aws_data_pipeline_2.pdf)
 
 #### Spark job orchestration and state assessment with StepFunctions
 
@@ -260,8 +266,6 @@ Cloudwatch Dashboard provides timeline for the following metrics:
 | Executors Metrics | Measures performance and usage of executors | Running Executors | CPU Allocated | Memory Allocated | Disk Allocated  |
 | Job Metrics | Provides insights into job performance and efficiency | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
 | Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
-
-Shows how utilized the pre-initialized capacity is
 
 ## Transition to a streaming application
 
