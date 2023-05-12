@@ -1,5 +1,6 @@
 # ignore .DS_Store
 .DS_Store
 .bkp
-.drawio
+*.drawio
 interview.md
+temp.md

@@ -51,15 +51,15 @@ Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 
 
 ## Architectural choices for data processing
 
-By the conditions of this task it was defined that the data are read in batches once a day. Each batch includes sensor readings from the SCADA system for the day preceding the day of the moment of pipeline execution.
+According to the requirements of this task, data is fetched in daily batches. Each batch includes sensor readings from the SCADA system for the day preceding the day of the moment of pipeline execution.
 
-Based on these inputs, we decided to build an event-driven data pipeline using recently released Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. We shall also use AWS Fargate in Elastic Container Services (ECS). 
+Based on these inputs, we decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. We will also be using AWS Fargate in Elastic Container Services (ECS). 
 
-Later, we will talk about the reasons for picking this services and compare them to other processing and data technologies available on the Amazon platform. Moreover we shall discuss what changes need to be made to convert this stack into real-time streaming application based on Spark Structured Streaming.
+Later on, we will cover the reasons for choosing these services and compare them to other processing and data technologies available on the Amazon platform. In addition, we will discuss the changes that need to be made in order to convert this stack into a real-time streaming application based on Spark Structured Streaming.
 
 ### AWS Fargate on ECS
 
-ECS cluster with a Fargate task is a serverless container orchestration solution that enables us to deploy, manage, and scale containerized applications without the need to manage the underlying infrastructure. We define your application's container requirements in a task definition, create an ECS service to run and maintain the tasks, and Fargate handles the rest.
+ECS cluster with a Fargate task is a serverless container orchestration solution that enables us to deploy, manage, and scale containerized applications without the need to manage the underlying infrastructure. We define application's container requirements in a task definition, create an ECS service to run and maintain the tasks, and Fargate handles the rest.
 
 **The primary task of the Kafka client container application deployed in ECS is to retrieve, parse data and publish messages to the Amazon MSK topic**.
 
@@ -240,7 +240,7 @@ Spark job source code file available at [`src/spark`](<src/spark>) folder, Lambd
 - **Modularity**: With each state in the workflow having a specific purpose, the overall process becomes easier to understand.
 - **Scalability and cost-effectiveness**: The service scales automatically with workload, charging only for what you use, making it a cost-effective choice for managing workflows
 
-As of Feb 17, 2023 AWS Step Functions adds integration for 35 services including EMR Serverless. Per [Amazon press statement](<https://aws.amazon.com/about-aws/whats-new/2023/02/aws-step-functions-integration-35-services-emr-serverless/>):
+As of Feb 17, 2023 AWS Step Functions added integration for 35 services including EMR Serverless. Per [Amazon press statement](<https://aws.amazon.com/about-aws/whats-new/2023/02/aws-step-functions-integration-35-services-emr-serverless/>):
 > By directly invoking AWS services or their API actions from AWS Step Functions, customers can write less code, simplify their architecture and save costs. The newly supported direct integrations include Amazon EMR Serverless ... In addition, Step Functions also added support for 1000+ new API actions from new and existing AWS services such as Amazon DynamoDB and Amazon Athena.
 
 This will enable StepFunctions to directly launch EMR serverless jobs in future iterations of this workflow without using Lambda functions as an intermediary.
@@ -284,10 +284,9 @@ There are two main components of this solution: data processing and workflow orc
   </tr>
   <tr>
     <td><b>AWS Glue</b></td>
-    <td>A serverless data integration service that automates ETL tasks and provides a data catalog</td>
+    <td>Serverless ETL (Extract, Transform, Load) service that automates ETL tasks and provides a data catalog</td>
     <td>
       <ul>
-        <li>Serverless ETL (Extract, Transform, Load) service</li>
         <li>Automatically discovers and categorizes data</li>
         <li>Data catalog to store metadata</li>
         <li>Generates ETL code in Python or Scala</li>
