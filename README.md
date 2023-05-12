@@ -192,7 +192,7 @@ Please consult [Algorithm: Combination of signal processing and convolutional ne
 
 6. Stores the data in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
 
-7. From the `gold` bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults' lambda function that queries the parquet file using the PyArrow library using `deviceID' and returns the JSON result of the prediction.
+7. From the `gold` bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults` lambda function that queries the parquet file using the PyArrow library using `deviceID` and returns the JSON result of the prediction.
 
 The steps above imply use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** libraries to achieve the intended result.
 
@@ -382,7 +382,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     and microservices using visual workflows</td>
     <td>
       <ul> 
-        <li>Easy to visualize and manage workflows</li>
+        <li>Easy&nbsp;to&nbsp;visualize&nbsp;and&nbsp;manage&nbsp;workflows</li>
         <li>Integrates with many AWS services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
         <li>Supports both long and short running processes</li>
