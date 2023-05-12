@@ -318,7 +318,7 @@ There are two main components of this solution: data processing and workflow orc
     </td>
     <td>
       <ul>
-        <li>Does not support Spark or TensorFlow natively<li>
+        <li>Does not support Spark or TensorFlow natively</li>
         <li>Less powerful and scalable than EMR or Glue for ETL tasks</li>
         <li>Some errors may require manual intervention</li>
         <li>Limited integration with other AWS services compared to EMR or Glue</li>
@@ -359,7 +359,7 @@ There are two main components of this solution: data processing and workflow orc
     <td>
       <ul>
         <li>Limited application support: have only Spark or Hive</li>
-        <li>User needs to build and push custom images to ECR</li>
+        <li>Users need to build and push custom images to ECR</li>
         <li>It is critical to choose the correct version of each JAR dependencies</li>
         <li>Creates an elastic network interface for each worker, thereby increasing costs</li>
       </ul>  
@@ -391,7 +391,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     <td>
       <ul> 
         <li>Easy to visualize and manage workflows</li>
-        <li>Integrates&nbsp;with&nbsp;many&nbsp;AWS&nbsp;services</li>
+        <li>Integrates&nbsp;with&nbsp;many&nbsp;AWS services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
         <li>Supports both long and short running processes</li>
       </ul>
