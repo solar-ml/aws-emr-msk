@@ -285,7 +285,7 @@ There are two main components of this solution: data processing and workflow orc
     <td>A serverless data integration service that automates ETL tasks and provides a data catalog</td>
     <td>
       <ul>
-        <li>Easy to set up and use</li>
+        <li>Easy&nbsp;to&nbsp;set&nbsp;up&nbsp;and&nbsp;use</li>
         <li>Automatically generates code and metadata</li>
         <li>Integrates with other AWS services</li>
         <li>Support Spark jobs</li>
