@@ -1,4 +1,4 @@
-## Designing a workflow for fault detection and classification in photovoltaic systems
+## AWS Workflow for PV System Fault Detection
 
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
