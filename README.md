@@ -382,7 +382,7 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     and microservices using visual workflows</td>
     <td>
       <ul> 
-        <li>Easy&nbsp;to&nbsp;visualize&nbsp;and&nbsp;manage&nbsp;workflows</li>
+        <li>Easy&nbsp;to&nbsp;visualize&nbsp;and manage&nbsp;workflows</li>
         <li>Integrates with many AWS services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
         <li>Supports both long and short running processes</li>
