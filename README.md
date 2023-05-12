@@ -288,7 +288,7 @@ There are two main components of this solution: data processing and workflow orc
     <td>
       <ul>
         <li>Serverless ETL (Extract, Transform, Load) service</li>
-        <li>Automatically&nbsp;discovers&nbsp;and&nbsp;categorizes&nbsp;data</li>
+        <li>Automatically discovers and categorizes data</li>
         <li>Data catalog to store metadata</li>
         <li>Generates ETL code in Python or Scala</li>
         <li>Support Spark jobs</li>
@@ -318,7 +318,7 @@ There are two main components of this solution: data processing and workflow orc
     </td>
     <td>
       <ul>
-        <li>Does&nbsp;not&nbsp;support&nbsp;Spark&nbsp;or&nbsp;TensorFlow&nbsp;natively<li>
+        <li>Does not support Spark or TensorFlow natively<li>
         <li>Less powerful and scalable than EMR or Glue for ETL tasks</li>
         <li>Some errors may require manual intervention</li>
         <li>Limited integration with other AWS services compared to EMR or Glue</li>
