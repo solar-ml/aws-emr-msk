@@ -302,7 +302,7 @@ There are two main components of this solution: data processing and workflow orc
   </tr>
   <tr>
     <td><b>AWS Data Pipeline</b></td>
-    <td>A web service reliably processes and moves data between different AWS compute and storage services, as well as on-premises data sources</td>
+    <td>A web service reliably that processes and moves data between different AWS compute and storage services, as well as on-premises data sources</td>
     <td>
       <ul>
         <li>Easy to create data pipelines using a drag-and-drop console or templates</li>
@@ -382,8 +382,8 @@ Next, we evaluate two workflow orchestration options, namely AWS Step Functions 
     and microservices using visual workflows</td>
     <td>
       <ul> 
-        <li>Easy&nbsp;to&nbsp;visualize&nbsp;and manage&nbsp;workflows</li>
-        <li>Integrates with many AWS services</li>
+        <li>Easy to visualize and manage workflows</li>
+        <li>Integrates&nbsp;with&nbsp;many&nbsp;AWS&nbsp;services</li>
         <li>Simple and flexible state language (Amazon States Language)</li>
         <li>Supports both long and short running processes</li>
       </ul>
