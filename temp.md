@@ -1,6 +1,45 @@
 
 There are two main components of the solution: data processing and workflow orchestration. AWS offers many services that are well suited for ETL tasks. Each service has its own unique features, strengths and limitations, as well as overlapping functionality. We shall give a brief overview and choose those that fit best in our particular case.  
 
+
+AWS Step Functions:
+Visual workflows to coordinate distributed applications and microservices.
+Built-in error handling and retries.
+Suitable for various types of applications, not just data processing.
+Integrates with various AWS services, such as Lambda, ECS, and Batch.
+Pay-as-you-go pricing based on the number of state transitions.
+
+AWS Data Pipeline:
+Designed specifically for data-driven workflows.
+Supports data movement and data transformation.
+Integrates with AWS services, such as S3, RDS, and EMR.
+Scheduling capabilities and dependency tracking.
+Requires manual error handling and retries.
+Pay-as-you-go pricing based on the number of pipelines.
+
+According to the AWS documentation1, AWS Data Pipeline can handle some errors automatically, such as retrying failed tasks or rescheduling missed runs. However, some errors may require manual intervention, such as fixing the pipeline definition, resolving permission issues, or locating errors in pipelines2. You can also create an SNS notification that includes error information for Data Pipeline activities using the SnsAlarm action3.
+
+
+AWS Glue:
+Serverless ETL (Extract, Transform, Load) service.
+Automatically discovers and categorizes data.
+Data catalog to store metadata.
+Generates ETL code in Python or Scala.
+Supports scheduling and dependency tracking.
+Integrates with AWS services like S3, RDS, and Redshift.
+Pay-as-you-go pricing based on the number of data processing units (DPUs) and data catalog usage.
+
+Amazon EMR (Elastic MapReduce):
+Managed Hadoop framework to process vast amounts of data.
+Supports Apache Spark, Hadoop, Presto, and other big data frameworks.
+Scalable and customizable clusters.
+Suitable for large-scale data processing tasks, such as machine learning and data mining.
+Integrates with AWS services like S3, RDS, and DynamoDB.
+Pricing based on the number of instances and instance types in the cluster.
+
+While each of these services can be used for orchestrating and managing data jobs, they have different focuses and strengths. AWS Step Functions is a versatile service that provides a visual workflow, making it easy to manage various types of applications. In contrast, AWS Data Pipeline and AWS Glue are designed specifically for data-driven workflows, with Glue focusing on serverless ETL tasks. Amazon EMR is geared towards large-scale data processing using popular big data frameworks. Depending on your specific use case and requirements, you may choose one of these services over the others.
+
+
 We will consider between:
 - **AWS Glue**, 
 - **AWS Data Pipeline**, 

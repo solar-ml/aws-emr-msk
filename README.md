@@ -229,6 +229,8 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 
 - `NotifyFailure` **task** state triggers a Lambda function [`notify_failure`](<src/lambda/notify_failure_lambda.py>) to send a notification about the **failure of any of the previous steps**. 
 
+Spark job source code file available at [`src/spark`](<src/spark>) folder, Lambda functions source code file available at [`src/lambda`](<src/lambda>) folder.
+
 #### Advantages of using the StepFunctions approach:
 
 - **Error handling**: Errors are managed at each Task state, providing a robust way to handle failures.
@@ -285,15 +287,19 @@ There are two main components of this solution: data processing and workflow orc
     <td>A serverless data integration service that automates ETL tasks and provides a data catalog</td>
     <td>
       <ul>
-        <li>Easy&nbsp;to&nbsp;set&nbsp;up&nbsp;and&nbsp;use</li>
-        <li>Automatically generates code and metadata</li>
-        <li>Integrates with other AWS services</li>
+        <li>Serverless ETL (Extract, Transform, Load) service</li>
+        <li>Automatically&nbsp;discovers&nbsp;and&nbsp;categorizes&nbsp;data</li>
+        <li>Data catalog to store metadata</li>
+        <li>Generates ETL code in Python or Scala</li>
         <li>Support Spark jobs</li>
+        <li>Supports scheduling and dependency tracking</li>
+        <li>Pay-as-you-go pricing based on the number of data processing units (DPUs) and data catalog usage</li>
       </ul> 
     </td> 
     <td>
       <ul>
-        <li>More&nbsp;expensive&nbsp;than&nbsp;EMR</li>
+        <li>Does not support branching</li>
+        <li>More expensive than EMR</li>
         <li>Limited worker types and memory</li>
         <li>Less flexible and customizable than EMR</li>
         <li>Dependency size limit is 250MB in total</li>
@@ -302,7 +308,7 @@ There are two main components of this solution: data processing and workflow orc
   </tr>
   <tr>
     <td><b>AWS Data Pipeline</b></td>
-    <td>A web service reliably that processes and moves data between different AWS compute and storage services, as well as on-premises data sources</td>
+    <td>Web service designed specifically for data-driven workflows across AWS compute and storage services and on-premises data sources</td>
     <td>
       <ul>
         <li>Easy to create data pipelines using a drag-and-drop console or templates</li>
@@ -312,20 +318,22 @@ There are two main components of this solution: data processing and workflow orc
     </td>
     <td>
       <ul>
-        <li>Does not support PySpark or TensorFlow natively</li>
+        <li>Does&nbsp;not&nbsp;support&nbsp;Spark&nbsp;or&nbsp;TensorFlow&nbsp;natively<li>
         <li>Less powerful and scalable than EMR or Glue for ETL tasks</li>
+        <li>Some errors may require manual intervention</li>
         <li>Limited integration with other AWS services compared to EMR or Glue</li>
       </ul>  
     </td>
   </tr>
   <tr>
     <td><b>EMR on EC2/EKS/Outpost</b></td>
-    <td>A big data platform that allows you to configure your own cluster of EC2 instances or Kubernetes pods to run various Hadoop ecosystem components</td>
+    <td>Managed Hadoop framework for processing massive amounts of data. Allows users to configure their own cluster of EC2 instances or Kubernetes pods to run different components of the Hadoop ecosystem.</td>
     <td>
       <ul>
         <li>Complete control over cluster configuration and management</li>
-        <li>Supports a wide range of use cases and tools, including machine learning, streaming, SQL queries</li>
-        <li>Many supported instance types to choose from</li>
+        <li>Supports Apache Spark, Hadoop, Presto, and other big data frameworks<li>
+        <li>Scalable and customizable clusters</li>
+        <li>Suitable for large-scale data processing tasks, such as machine learning and data mining</li>
       </ul>  
     </td>
     <td>
