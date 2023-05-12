@@ -293,7 +293,7 @@ There are two main components of this solution: data processing and workflow orc
     </td> 
     <td>
       <ul>
-        <li>More expensive than EMR</li>
+        <li>More&nbsp;expensive&nbsp;than&nbsp;EMR</li>
         <li>Limited worker types and memory</li>
         <li>Less flexible and customizable than EMR</li>
         <li>Dependency size limit is 250MB in total</li>
