@@ -94,7 +94,7 @@ Since we are connecting to MSK Serverless from EMR Serverless, we need to config
 Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR on EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom Docker image based on the existing `emr-serverless/spark/emr-6.7.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
 
 1. Create a Dockerfile with the following contents:
-```
+```Dockerfile
 FROM public.ecr.aws/emr-serverless/spark/emr-6.7.0:latest
 
 USER root
