@@ -330,15 +330,15 @@ There are two main components of this solution: data processing and workflow orc
     <td>Managed Hadoop framework for processing massive amounts of data. Allows users to configure their own cluster of EC2 instances or Kubernetes pods to run different components of the Hadoop ecosystem.</td>
     <td>
       <ul>
-        <li>Complete control over cluster configuration and management</li>
-        <li>Supports Apache Spark, Hadoop, Presto, and other big data frameworks<li>
+        <li>Complete&nbsp;control&nbsp;over&nbsp;cluster configuration and management</li>
+        <li>Supports Apache Spark, Hadoop, Presto, and other big data frameworks</li>
         <li>Scalable and customizable clusters</li>
         <li>Suitable for large-scale data processing tasks, such as machine learning and data mining</li>
       </ul>  
     </td>
     <td>
       <ul>
-        <li>Requires more planning, configuration, and scaling of clusters</li>
+        <li>Requires&nbsp;more&nbsp;planning,&nbsp;configuration, and scaling of clusters</li>
         <li>More complex and error-prone than serverless options</li>
         <li>May incur higher costs if clusters are not optimized or terminated properly</li>
         <li>You may need to over-provision resources to handle peak workloads or under-provision resources during off-peak</li>
