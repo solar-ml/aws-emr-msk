@@ -350,8 +350,8 @@ There are two main components of this solution: data processing and workflow orc
     <td>EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications such as Apache Spark and Apache Hive</td>
     <td>
       <ul>
-        <li>Pay-per-use pricing: you only pay for the resources used during job execution, making it cost-efficient for infrequent or unpredictable workloads</li>
-        <li>You are not billed for idle time between jobs</li>
+        <li>Pay-per-use pricing: user only pays for the resources used during job execution</li>
+        <li>Cost-efficient for infrequent or unpredictable workloads</li>
         <li>Resource allocation and scaling: automatically scales resources based on workload</li>
         <li>Provides a pre-initialized capacity feature that keeps workers initialized and ready to respond in seconds</li>
       </ul>  
