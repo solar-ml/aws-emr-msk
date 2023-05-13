@@ -232,7 +232,7 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 
 ![](img/aws_data_pipeline_2.svg)
 
-Diagram above available in [PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipeline_2.svg) [PDF](img/aws_data_pipeline_2.pdf) formats.
+Diagram above is scalable and available in [PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipeline_2.svg) [PDF](img/aws_data_pipeline_2.pdf) formats.
 
 #### Spark Job Orchestration and State Assessment with StepFunctions
 
