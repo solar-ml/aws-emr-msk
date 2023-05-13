@@ -148,7 +148,7 @@ We  associate the new MSK Serverless Cluster with the EMR Serverless Application
 
 Amazon Elastic Container Service (ECS) and Amazon Simple Storage Service (S3) are both AWS services accessed through public service endpoints. To gain access to these services from private networks, we need to create VPC endpoints that enable use of private IP addresses to access public services without exposure to the public Internet.
 
-The images in a private ECR repository are stored in Amazon S3 buckets that are managed by ECR. Users can’t access these buckets directly, but can use the ECR APIs to manage images. As a result, we need VPC endpoints for ECR and one for S3 to retrieve the image from ECR because these are different AWS services that have different public service endpoints.
+The images in a private ECR repository are stored in Amazon S3 buckets that are managed by ECR. Users can’t access these buckets directly, but can use the ECR APIs to manage images. As a result, we need VPC endpoint for ECR and one for S3 to retrieve the image from ECR because these are different AWS services that have different public service endpoints.
 
 To access the Spark resources in Amazon S3 from EMR Serverless running in the two private subnets, we need a VPC Endpoint for S3. Specifically, a `gateway endpoint`, which sends traffic to Amazon S3 using private IP addresses. EMR Serverless does not require public IP addresses, and we don’t need an internet gateway (IGW), a NAT device, or a virtual private gateway in VPC to connect to S3.
 
@@ -156,7 +156,7 @@ To access our custom TensorFlow-enabled image `my-emr-serverless-spark`, we need
 
 ECS on Fargate also requires access to our custom image `kafka-streams-msk` with Apache Kafka Streams API files from ECR registry. 
 
-In summary, we have to create 2 gateway endpoints and 2 interface endpoints for use ECS on Fargate and EMR Serverless. If containers we need are available publicly that we can just use NAT gateway, which facilitates Internet access to hosts in private networks, and pull required images from public ECR repository.
+In summary, we create 2 gateway endpoints and 2 interface endpoints to ensure operation of ECS on Fargate and EMR Serverless. If the containers we need were publicly available, we could have just used NAT gateway, which facilitates Internet access to hosts in private networks, and pull required images from public ECR repository.
 
 
 ### Spark and Data Resources in Amazon S3
