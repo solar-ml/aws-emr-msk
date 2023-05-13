@@ -1,5 +1,6 @@
 /backup/
 .DS_Store
+*.$*
 *.bkp
 *.drawio
 interview.md
