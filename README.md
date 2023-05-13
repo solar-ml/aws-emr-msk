@@ -23,13 +23,13 @@
 
 Electrical faults in photovoltaic (PV) systems can occur due to various internal system errors or due to external influences. Our task is to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** used by most PV system manufacturers.
 
-Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the MPPT algorithm to operate the PV module at the maximum power point (MPP). The locations of typical PV panel problems are shown symbolically.
+Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). The locations of typical PV panel problems are shown symbolically.
 ![](img/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
 </p> -->
 
-Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
+Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. They are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory Control and Data Acquisition) system.
 
 ## Data Size Estimate
 
@@ -47,17 +47,17 @@ schema = StructType([
 ```
 Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the size of the data, we consider the size of each data point and the rate at which they are generated. Suppose the readings from 4 sensors installed on 10,000 solar panels are collected in the SCADA system every 20 seconds and consumed once every 24 hours.
 
-Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB per day of binary data, while 100k devices will generate 14.7GB daily.
+Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. So 10k PV panels will generate at least 1.47GB per day of binary data, while 100k devices will generate 14.7GB daily.
 
 ## Architectural Choices for Data Processing
 
-According to the requirements of this task, data is retrieved in daily batches. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
+Data is collected once a day in batches on a schedule in accordance with requirements. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
 
-Given these inputs, we decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are variable and hard to predict. 
+We decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are are infrequent or hard to predict. 
 
-We will also rely on AWS Fargate in Elastic Container Services (ECS) to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
+We also rely on AWS Fargate on Elastic Container Services (ECS) to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
 
-Pipeline execution is orchestrated with AWS StepFunctions state machine, which run on schedule defined in AWS Event Bridge rule.
+Pipeline execution is orchestrated using the AWS StepFunctions state machine, which runs according to the schedule defined in the AWS Event Bridge rule.
 
 Later on, we will compare selected stack to other data processing technologies available on the Amazon platform. In addition, we will discuss the changes that need to be made in order to convert this stack into a real-time streaming application based on Spark Structured Streaming.
 
