@@ -53,13 +53,13 @@ Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 
 
 Data is collected once a day in batches on a schedule in accordance with requirements. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
 
-We decided to build an event-driven data pipeline using **Amazon EMR (Elastic MapReduce) Serverless** and **Amazon Managed Streaming for Apache Kafka (MSK) Serverless** for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are are infrequent or hard to predict. 
+We decided to build an event-driven data pipeline using **Amazon EMR (Elastic MapReduce) Serverless** and **Amazon Managed Streaming for Apache Kafka (MSK) Serverless** for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs so users don't have to worry about over- or under-provisioning resources. Users also pay only for the data volume that we stream and retain, so they can optimize costs for infrequent workloads.
 
 We also rely on **AWS Fargate on Elastic Container Services (ECS)** to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
 
 Pipeline execution is orchestrated using the **AWS StepFunctions** state machine, which runs according to the schedule defined in the **AWS EventBridge** rule.
 
-In addition to PySpark, algorithm used to solve business case here makes use of signal processing library **PyWavelets**, pre-trained convolutional neural network **TensorFlow** model, **PyArrow** library to access parquet files from Lambda functions. 
+In addition to PySpark, the algorithm uses the signal processing library **PyWavelets**, pre-trained convolutional neural network **TensorFlow** model, **PyArrow** library to access parquet files from Lambda functions. 
 
 Later on, we will compare selected stack to other data processing technologies available on the Amazon platform. In addition, we will discuss the changes that need to be made in order to convert this stack into a real-time streaming application based on Spark Structured Streaming.
 
@@ -85,6 +85,12 @@ Next we use CloudFormation template to create ECS cluster, Fargate task, and ser
 
 ### Amazon EMR Serverless Application
 
+According to [AWS](<https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/emr-serverless.html>), EMR Serverless provides a serverless runtime environment that simplifies the operation of analytics applications that use Apache Spark and Apache Hive. With EMR Serverless, you don’t have to configure, optimize, secure, or operate clusters to run applications with these frameworks.
+
+EMR Serverless helps you avoid over- or under-provisioning resources for your data processing jobs. EMR Serverless automatically determines the resources that the application needs, gets these resources to process your jobs, and releases the resources when the jobs finish. 
+
+For use cases where applications need a response within seconds, such as interactive data analysis, you can pre-initialize the resources that the application needs when you create the application. **Pre-initialized capacity** feature keeps workers initialized and ready to respond in seconds. This capacity effectively creates a warm pool of workers for an application. When you configure pre-initialized capacity, jobs can start immediately so that you can implement iterative applications and time-sensitive jobs.
+
 The creation of the EMR Serverless Application includes the following resources:
 1. Amazon S3 Bootstrap bucket for storage of Spark resources;
 2. Amazon VPC with at least two private subnets and associated Security Group(s);
@@ -93,9 +99,7 @@ The creation of the EMR Serverless Application includes the following resources:
 
 For this task, we use EMR Studio Serverless Application console to create a Spark application.
 
-EMR Serverless provides a **pre-initialized capacity** feature that keeps workers initialized and ready to respond in seconds. This capacity effectively creates a warm pool of workers for an application. When you configure pre-initialized capacity, jobs can start immediately so that you can implement iterative applications and time-sensitive jobs.
-
-Since we are connecting to MSK Serverless from EMR Serverless, we need to configure VPC access. We need to create VPC and at least two private subnets in different Availability Zones (AZs). According to the documentation, the subnets selected for EMR Serverless must be private subnets. The associated route tables for the subnets should not contain direct routes to the Internet.
+Also, since we are connecting to MSK Serverless from EMR Serverless, we need to configure VPC access. We need to create VPC and at least two private subnets in different Availability Zones (AZs). According to the documentation, the subnets selected for EMR Serverless must be private subnets. The associated route tables for the subnets should not contain direct routes to the Internet.
 
 Currently EMR Serverless only includes Spark and Hive as pre-installed applications, unlike EMR on EC2/EKS which includes massive selection of libraries. However, this issue is addressed by creating a custom Docker image based on the existing `emr-serverless/spark/emr-6.7.0` and adding TensorFlow, NumPy, Pandas and PyWavelets to it.
 
@@ -140,6 +144,8 @@ docker push <account_id>.dkr.ecr.<region>.amazonaws.com/my-emr-serverless-spark:
 
 ### Amazon MSK Serverless Cluster
 
+According to [AWS](<https://aws.amazon.com/msk/features/msk-serverless/>), Amazon MSK Serverless is a cluster type for Amazon MSK that makes it easy to run Apache Kafka without managing and scaling cluster capacity. MSK Serverless automatically provisions and scales compute and storage resources, so you can use Apache Kafka on demand and only pay for the data you stream and retain.
+
 The creation of the MSK Serverless Cluster includes the following resources:
 
 1. AWS IAM Role and associated IAM Policy for the Amazon EC2 Kafka client instance;
@@ -147,7 +153,7 @@ The creation of the MSK Serverless Cluster includes the following resources:
 3. We use Fargate on ECS as Apache Kafka client;
 4. Amazon MSK Serverless Cluster;
 
-We  associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
+We associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
 
 
 ### VPC Endpoints for S3 and ECR
