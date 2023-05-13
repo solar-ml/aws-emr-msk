@@ -149,8 +149,8 @@ According to [AWS](<https://aws.amazon.com/msk/features/msk-serverless/>), Amazo
 The creation of the MSK Serverless Cluster includes the following resources:
 
 1. AWS IAM Role and associated IAM Policy for the Amazon EC2 Kafka client instance;
-2. VPC with at least one public subnet and associated Security Group(s); ??
-3. We use Fargate on ECS as Apache Kafka client;
+2. VPC with at least one public subnet and associated Security Group(s);
+3. We use AWS Fargate on ECS as Apache Kafka client;
 4. Amazon MSK Serverless Cluster;
 
 We associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
@@ -233,7 +233,7 @@ Links schema above in [PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipe
 
 #### Spark Job Orchestration and State Assessment with StepFunctions
 
-![](img/stepfunctions_graph.png)
+![](img/stepfunctions_graph.svg)
 
 - `IngestData` **task** state triggers a Lambda function [`ingest_data`](<src/lambda/ingest_data_lambda.py>) which gets necessary parameters from Parameter Store and executes the [`ingest_data.py`](<src/lambda/ingest_data_lambda.py>) script from S3 `bootstrap` bucket on an EMR Serverless cluster to consume data from a MSK topic. The function takes care of submitting the EMR job and returns the `job_id` for use downstream. If the function encounters an error, it will retry up to 6 times with an exponential backoff strategy. If all retries fail, it moves to the `NotifyFailure` state. 
 
