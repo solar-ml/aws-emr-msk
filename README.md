@@ -144,11 +144,20 @@ The creation of the MSK Serverless Cluster includes the following resources:
 We  associate the new MSK Serverless Cluster with the EMR Serverless Application’s VPC and two private subnets. Also, associate the cluster with the Fargate-based Kafka client instance’s VPC and its subnet.
 
 
-### VPC Endpoint for S3
+### VPC Endpoints for S3 and ECR
 
-To access the Spark resource in Amazon S3 from EMR Serverless running in the two private subnets, we need a VPC Endpoint for S3. Specifically, a Gateway Endpoint, which sends traffic to Amazon S3 or DynamoDB using private IP addresses. A gateway endpoint for Amazon S3 enables you to use private IP addresses to access Amazon S3 without exposure to the public Internet. EMR Serverless does not require public IP addresses, and we don’t need an internet gateway (IGW), a NAT device, or a virtual private gateway in VPC to connect to S3.
+Amazon Elastic Container Service (ECS) and Amazon Simple Storage Service (S3) are both AWS services accessed through public service endpoints. To gain access to these services from private networks, we need to create VPC endpoints that enable use of private IP addresses to access public services without exposure to the public Internet.
 
-We make the VPC Endpoint for S3 (Gateway Endpoint) and add the route table for the two EMR Serverless private subnets.
+The images in a private ECR repository are stored in Amazon S3 buckets that are managed by ECR. Users can’t access these buckets directly, but can use the ECR APIs to manage images. As a result, we need VPC endpoints for ECR and one for S3 to retrieve the image from ECR because these are different AWS services that have different public service endpoints.
+
+To access the Spark resources in Amazon S3 from EMR Serverless running in the two private subnets, we need a VPC Endpoint for S3. Specifically, a `gateway endpoint`, which sends traffic to Amazon S3 using private IP addresses. EMR Serverless does not require public IP addresses, and we don’t need an internet gateway (IGW), a NAT device, or a virtual private gateway in VPC to connect to S3.
+
+To access our custom TensorFlow-enabled image `my-emr-serverless-spark`, we need `interface endpoints` for ECR, which are powered by AWS PrivateLink and allow us to connect our VPC to supported AWS services and VPC endpoint services powered by PrivateLink. 
+
+ECS on Fargate also requires access to our custom image `kafka-streams-msk` with Apache Kafka Streams API files from ECR registry. 
+
+In summary, we have to create 2 gateway endpoints and 2 interface endpoints for use ECS on Fargate and EMR Serverless. If containers we need are available publicly that we can just use NAT gateway, which facilitates Internet access to hosts in private networks, and pull required images from public ECR repository.
+
 
 ### Spark and Data Resources in Amazon S3
 
