@@ -1,5 +1,5 @@
 ## AWS Workflow for PV System Fault Detection
-(proof of concept of the AWS and PySpark data pipeline form May-16 meeting)
+(AWS and PySpark data pipeline proof of concept for 16 May meeting)
 
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
