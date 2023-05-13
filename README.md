@@ -6,7 +6,7 @@
     1. [AWS Fargate on ECS](#aws-fargate-on-ecs)
     2. [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
     3. [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
-    4. [VPC Endpoint for S3](#vpc-endpoint-for-s3)
+    4. [VPC Endpoints for S3 and ECR](#vpc-endpoints-for-s3-and-ecr)
     5. [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
 4. [Fault Detection Algorithm Description](#fault-detection-algorithm-description)
 5. [AWS Data Pipeline Diagram](#aws-data-pipeline)
