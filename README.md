@@ -51,9 +51,13 @@ Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 
 
 ## Architectural choices for data processing
 
-According to the requirements of this task, data is fetched in daily batches. Each batch includes sensor readings from the SCADA system for the day preceding the day of the moment of pipeline execution.
+According to the requirements of this task, data is retrieved in daily batches. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
 
-Based on these inputs, we decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are variable and hard to predict. We will also be using AWS Fargate in Elastic Container Services (ECS). 
+Given these inputs, we decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are variable and hard to predict. 
+
+We will also rely on AWS Fargate in Elastic Container Services (ECS) to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
+
+Pipeline execution is orchestrated with AWS StepFunctions state machine, which run on schedule defined in AWS Event Bridge rule.
 
 Later on, we will compare selected stack to other data processing technologies available on the Amazon platform. In addition, we will discuss the changes that need to be made in order to convert this stack into a real-time streaming application based on Spark Structured Streaming.
 
