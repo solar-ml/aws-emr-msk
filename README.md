@@ -7,19 +7,19 @@
     2. [Amazon EMR Serverless Application](#amazon-emr-serverless-application)
     3. [Amazon MSK Serverless Cluster](#amazon-msk-serverless-cluster)
     4. [VPC Endpoints for S3 and ECR](#vpc-endpoints-for-s3-and-ecr)
-    5. [Spark and Data Resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
-4. [Fault Detection Algorithm Description](#fault-detection-algorithm-description)
-5. [AWS Data Pipeline Diagram](#aws-data-pipeline)
+    5. [Spark and data resources in Amazon S3](#spark-and-data-resources-in-amazon-s3)
+4. [Fault detection algorithm description](#fault-detection-algorithm-description)
+5. [AWS data pipeline diagram](#aws-data-pipeline)
     1. [Spark job orchestration and state assessment with StepFunctions](#spark-job-orchestration-and-state-assessment-with-stepfunctions)
 6. [CloudWatch Dashboard for EMR Serverless](#cloudwatch-dashboard-for-emr-serverless)
 7. [Transition to a streaming application](#transition-to-a-streaming-application)
 8. [Exploring alternative data technologies](#exploring-alternative-data-technologies)
 9. Supplementary materials
-    1. [Fault Detection and Classification in Photovoltaic Arrays](fault_detection_and_classification.md)
+    1. [Fault detection and classification in photovoltaic arrays](fault_detection_and_classification.md)
     2. [Wavelet Transformation introduction](wavelet_transform_intro.md)
-    3. [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md)
+    3. [Algorithm: combination of signal processing and convolutional neural network](algorithm.md)
 
-## Problem description
+## Problem Description
 
 Electrical faults in photovoltaic (PV) systems can occur due to various internal system errors or due to external influences. Our task is to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** used by most PV system manufacturers.
 
@@ -31,7 +31,7 @@ Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel a
 
 Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. All of these components are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory control and data acquisition) system.
 
-## Data size estimate
+## Data Size Estimate
 
 The data represents the electrical and environmental readings of the 10k PV arrays installed in the solar plant system and contains the readings taken by the four sensors, together with the `deviceID` and `timestamp`. Below is a schema of messages obtained from consumption of Amazon Managed Streaming for Apache Kafka (MSK) topic in PySpark:
 
@@ -49,7 +49,7 @@ Each data point in binary format takes 10 + 8 + 16 = 34 bytes. To estimate the s
 
 Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 seconds/minute) / 20 seconds = 4,320. Total number of data points from all devices in 24 hours = 10,000 devices * 4,320 data points/device = 43,200,000 data points. Total daily batch size = 43,200,000 data points * 34 bytes/data point = 1,468,800,000 bytes = **1.47GB** or **1.37GiB** per day. According to the requirements, the data is collected once a day according to a schedule. So 10k PV panels will generate at least 1.47GB per day of binary data, while 100k devices will generate 14.7GB daily.
 
-## Architectural choices for data processing
+## Architectural Choices for Data Processing
 
 According to the requirements of this task, data is retrieved in daily batches. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
 
@@ -210,7 +210,8 @@ Please consult [Algorithm: Combination of signal processing and convolutional ne
 
 7. From the `gold` bucket, the data is accessible via the API gateway, which handles communication with a `QueryResults` lambda function that queries the parquet file using the PyArrow library using `deviceID` and returns the JSON result of the prediction.
 
-The steps above imply use of **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** libraries to achieve the intended result.
+So **PySpark**, **TensorFlow**, **PyWavelets** and **PyArrow** libraries are required for the case. 
+
 
 ## AWS Data Pipeline 
 
@@ -220,9 +221,9 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 
 ![](img/aws_data_pipeline_2.svg)
 
-[PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipeline_2.svg) [PDF](img/aws_data_pipeline_2.pdf)
+Links schema above in [PNG](img/aws_data_pipeline_2.png) [SVG](img/aws_data_pipeline_2.svg) [PDF](img/aws_data_pipeline_2.pdf) format.
 
-#### Spark job orchestration and state assessment with StepFunctions
+#### Spark Job Orchestration and State Assessment with StepFunctions
 
 ![](img/stepfunctions_graph.png)
 
@@ -246,9 +247,9 @@ At the heart of the workflow is the **AWS StepFunctions** state machine. It orch
 
 - `NotifyFailure` **task** state triggers a Lambda function [`notify_failure`](<src/lambda/notify_failure_lambda.py>) to send a notification about the **failure of any of the previous steps**. 
 
-Spark job source code file available at [`src/spark`](<src/spark>) folder, Lambda functions source code file available at [`src/lambda`](<src/lambda>) folder.
+Spark job source code file available at [`src/spark`](<src/spark>) folder, Lambda functions source code file available at [`src/lambda`](<src/lambda>) folder. AWS StepFunctions state machine code available [here](<stepfunctions.json>). 
 
-#### Advantages of using the StepFunctions approach:
+#### Advantages of Using the StepFunctions Approach:
 
 - **Error handling**: Errors are managed at each Task state, providing a robust way to handle failures.
 - **Retries**: Failed Lambda functions are retried with an exponential backoff strategy, reducing the impact of transient errors.
@@ -278,7 +279,7 @@ Cloudwatch Dashboard provides timeline for the following metrics:
 | Job Metrics | Provides insights into job performance and efficiency | Running Jobs | Success Jobs | Failed Jobs | Cancelled Jobs |
 | Job Runs | Aggregate view and point in time counters of job states for your application per minute | Pending jobs counter | Running jobs counter | Failed jobs counter |
 
-## Transition to a streaming application
+## Transition to a Streaming Application
 
 This workflow can also be reused in the future for applications that require SCADA system data processing and fault detection analysis of solar operation on a continuous basis. To convert this pipeline into a near real-time streaming application, we rely on Spark Structured Streaming.
 
@@ -286,7 +287,7 @@ Structured Streaming is a scalable and fault-tolerant stream processing engine b
 
 We will use structured streaming to consume data from Apache Kafka with a tumbling event-time window in real time. We will switch from batch to stream reading - from `read()` to `readstream()` and from `write()` to `writestream()`. We then apply the CWT transformation to the data bucketed within this window. The results are fed into a predictive model. The processed dataset, where each device state within a given interval is classified into 6 fault types, is exposed via a web service for use in the analytical dashboard and predictive maintenance reporting. This provides users with fast and granular PV array status updates.
 
-## Exploring alternative data technologies
+## Exploring Alternative Data Technologies
 
 There are two main components of this solution: data processing and workflow orchestration. AWS offers many services that are well suited for ETL tasks. Each service has its own unique features, strengths and limitations, as well as overlapping functionality. We shall give a brief overview and choose those that fit best in our particular case.  First, we'll explore the ETL and data processing and analytics applications available on AWS.
 
