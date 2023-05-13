@@ -1,4 +1,5 @@
 ## AWS Workflow for PV System Fault Detection
+(proof of concept of the AWS and PySpark data pipeline form May-16 meeting)
 
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
@@ -21,15 +22,17 @@
 
 ## Problem Description
 
-Electrical faults in photovoltaic (PV) systems can occur due to various internal system errors or due to external influences. Our task is to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** used by most PV system manufacturers.
+To demonstrate the proof of concept of the AWS and PySpark data pipeline, a business case was adopted that had a similar implementation in an industrial context, with the distinction of using services with pre-defined provisioning resources.
 
-Figure 1 shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). The locations of typical PV panel problems are shown symbolically.
+Electrical faults in photovoltaic (PV) systems can occur due to various internal arrangement errors or due to external factors. Our task will be to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** typically used by PV system manufacturers.
+
+The figure below shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). Marked are the locations of typical PV panel arrangement problems such as line-to-line faults, open-circuit faults, arc faults, etc.
 ![](img/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
 </p> -->
 
-Normally each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. They are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory Control and Data Acquisition) system.
+Each panel of the PV system is equipped with four sensors, namely: `voltage`, `current`, `temperature` and `irradiance` in addition to disconnection circuit and a servo motor. They are connected to the microcontroller unit which periodically (every 20 seconds) send readings to the remote terminal unit followed by the SCADA (Supervisory Control and Data Acquisition) system.
 
 ## Data Size Estimate
 
