@@ -1,6 +1,5 @@
 /backup/
 .DS_Store
-.$aws_data_pipeline.drawio.bkp
 *.drawio
 interview.md
 temp.md
