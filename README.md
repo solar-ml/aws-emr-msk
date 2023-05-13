@@ -53,11 +53,13 @@ Number of data points per device in 24 hours = (24 hours * 60 minutes/hour * 60 
 
 Data is collected once a day in batches on a schedule in accordance with requirements. Each batch contains sensor readings from the SCADA system for the day before the day of pipeline execution.
 
-We decided to build an event-driven data pipeline using Amazon EMR (Elastic MapReduce) Serverless and Amazon Managed Streaming for Apache Kafka (MSK) Serverless for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are are infrequent or hard to predict. 
+We decided to build an event-driven data pipeline using **Amazon EMR (Elastic MapReduce) Serverless** and **Amazon Managed Streaming for Apache Kafka (MSK) Serverless** for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs. They are recommended in cases where the throughput requirements of client applications are are infrequent or hard to predict. 
 
-We also rely on AWS Fargate on Elastic Container Services (ECS) to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
+We also rely on **AWS Fargate on Elastic Container Services (ECS)** to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
 
-Pipeline execution is orchestrated using the AWS StepFunctions state machine, which runs according to the schedule defined in the AWS Event Bridge rule.
+Pipeline execution is orchestrated using the **AWS StepFunctions** state machine, which runs according to the schedule defined in the **AWS EventBridge** rule.
+
+In addition to PySpark, algorithm used to solve business case here makes use of signal processing library **PyWavelets**, pre-trained convolutional neural network **TensorFlow** model, **PyArrow** library to access parquet files from Lambda functions. 
 
 Later on, we will compare selected stack to other data processing technologies available on the Amazon platform. In addition, we will discuss the changes that need to be made in order to convert this stack into a real-time streaming application based on Spark Structured Streaming.
 

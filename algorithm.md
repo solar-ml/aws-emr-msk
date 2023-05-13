@@ -13,7 +13,7 @@ The result of applying CWT to time series data are 2D matrices called "scalogram
 On figure 1 Visualization of ‘‘average scalograms’’ for six fault classes.
 
 <p align="center">
-  <img src="img/scalo_vis.jpg" width="65%"/>
+  <img src="img/scalo_vis.jpg" width="70%"/>
 </p>
 
 <!-- ![](img/scalo_vis.jpg) -->
