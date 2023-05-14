@@ -25,14 +25,14 @@ Resources:
     Properties:
       Name: bootstrap-servers
       Type: String
-      Value: '<your-kafka-servers>'
+      Value: 'boot-XXXXXXXX.c1.kafka-serverless.eu-central-1.amazonaws.com:9098'
 
   KafkaTopicsParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
       Name: read-topic
       Type: String
-      Value: '<your-kafka-topics>'
+      Value: 'solar.segment.01'
 
   SnsTopicParam:
     Type: 'AWS::SSM::Parameter'
