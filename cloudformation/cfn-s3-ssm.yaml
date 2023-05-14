@@ -1,5 +1,25 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
+  BootstrapBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: '<default-bootstrap-bucket-name>'
+
+  LogBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: '<default-log-bucket-name>'
+
+  SilverBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: '<default-silver-bucket-name>'
+
+  GoldBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: '<default-gold-bucket-name>'
+
   KafkaServersParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
@@ -31,30 +51,30 @@ Resources:
   BootstrapBucketParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
-      Name: bootstrap-bucket
+      Name: 'bootstrap-bucket'
       Type: String
-      Value: '<your-bootstrap-bucket>'
+      Value: !Ref BootstrapBucket
 
   LogBucketParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
-      Name: log-bucket
+      Name: 'log-bucket'
       Type: String
-      Value: '<your-log-bucket>'
+      Value: !Ref LogBucket
 
   SilverBucketParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
-      Name: silver-bucket
+      Name: 'silver-bucket'
       Type: String
-      Value: '<your-silver-bucket>'
+      Value: !Ref SilverBucket
 
   GoldBucketParam:
     Type: 'AWS::SSM::Parameter'
     Properties:
-      Name: gold-bucket
+      Name: 'gold-bucket'
       Type: String
-      Value: '<your-gold-bucket>'
+      Value: !Ref GoldBucket
 
 Outputs:
   KafkaServersParameterName:

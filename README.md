@@ -1,5 +1,5 @@
 ## AWS Workflow for PV System Fault Detection
-(AWS and PySpark data pipeline proof of concept for May-16 meeting)
+**AWS and PySpark data pipeline proof of concept for May 16th meeting**
 
 1. [Problem description](#problem-description)
 2. [Data size estimate](#data-size-estimate)
@@ -22,7 +22,7 @@
 
 ## Problem Description
 
-To demonstrate the proof of concept of the AWS and PySpark data pipeline, a business case was adopted that had a similar implementation in an industrial context, with the distinction of using services with pre-defined provisioning resources.
+To demonstrate the proof of concept of the AWS and PySpark data pipeline, I took a business case that I had implemented in an industrial context, with the difference that at the time it involved services with predefined provisioning resources, as their serverless counterparts were not available then.
 
 Electrical faults in photovoltaic (PV) systems can occur due to various internal arrangement errors or due to external factors. Our task will be to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** typically used by PV system manufacturers.
 
