@@ -27,6 +27,7 @@ To demonstrate the proof of concept of the AWS and PySpark data pipeline, I took
 Electrical faults in photovoltaic (PV) systems can occur due to various internal arrangement errors or due to external factors. Our task will be to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** typically used by PV system manufacturers.
 
 The figure below shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). Marked are the locations of typical PV panel arrangement problems such as line-to-line faults, open-circuit faults, arc faults, etc.
+
 ![](img/panel_schema.jpg)
 <!-- <p align="center">
   <img src="i/panel_schema.jpg" width="800" />
@@ -58,7 +59,7 @@ Data is collected once a day in batches on a schedule in accordance with require
 
 We decided to build an event-driven data pipeline using **Amazon EMR (Elastic MapReduce) Serverless** and **Amazon Managed Streaming for Apache Kafka (MSK) Serverless** for batch and streaming analytics with Apache Spark and Apache Kafka. EMR Serverless and MSK Serverless scale cluster capacity automatically in response to throughput needs so users don't have to worry about over- or under-provisioning resources. Users also pay only for the data volume that we stream and retain, so they can optimize costs for infrequent workloads.
 
-We also rely on **AWS Fargate on Elastic Container Services (ECS)** to run Apache Kafka Streams based container to pull data from remote SCADA into MSK topic. 
+We also rely on **AWS Fargate on Elastic Container Services (ECS)** to run Apache Kafka Streams based container to pull data from remote SCADA and publish into MSK topic. 
 
 Pipeline execution is orchestrated using the **AWS StepFunctions** state machine, which runs according to the schedule defined in the **AWS EventBridge** rule.
 
