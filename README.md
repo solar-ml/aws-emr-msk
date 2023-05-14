@@ -26,7 +26,7 @@ To demonstrate the proof of concept of the AWS and PySpark data pipeline, I took
 
 Electrical faults in photovoltaic (PV) systems can occur due to various internal arrangement errors or due to external factors. Our task will be to **build an early detection and fault classification algorithm using the available electrical and environmental measurements from the sensors** typically used by PV system manufacturers.
 
-The figure below shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). Marked are the locations of typical PV panel arrangement problems such as line-to-line faults, open-circuit faults, arc faults, etc.
+The figure below shows a typical PV system configuration consisting of a 5×3 PV panel and a boost converter programmed with the maximum power point tracking (MPPT) algorithm to operate the PV module at the maximum power point (MPP). Typical PV panel junction problems, such as line-to-line faults, open circuit faults, arc faults, along with external factors such as partial shading, are nominally marked in the figure.
 
 ![](img/panel_schema.jpg)
 <!-- <p align="center">
