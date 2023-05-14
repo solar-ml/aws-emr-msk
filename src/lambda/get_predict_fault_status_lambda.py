@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:get_predict_fault_status
+# arn:aws:lambda:eu-central-1:123456789012:function:get_predict_fault_status
 # This function gets the status of the predict_fault job and returns it
 
 import boto3

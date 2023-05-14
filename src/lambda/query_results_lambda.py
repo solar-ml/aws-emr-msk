@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:query_results
+# arn:aws:lambda:eu-central-1:123456789012:function:query_results
 # This function queries parquet based on deviceID and return JSON result
 
 import json

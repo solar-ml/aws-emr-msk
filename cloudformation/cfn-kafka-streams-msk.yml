@@ -25,7 +25,7 @@ Mappings:
     PrivateThree:
       CIDR: 10.0.3.0/24
   RegionAMI:
-    us-east-1:
+    eu-central-1:
       HVM64: ami-0d5eff06f840b45e9
     us-west-2:
       HVM64: ami-0cf6f5c8a62fa5da6

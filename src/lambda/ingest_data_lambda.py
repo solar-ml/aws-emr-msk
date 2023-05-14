@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:ingest_data
+# arn:aws:lambda:eu-central-1:123456789012:function:ingest_data
 # This function runs the ingest_data.py script on EMR Serverless and returns the job ID
 
 import boto3

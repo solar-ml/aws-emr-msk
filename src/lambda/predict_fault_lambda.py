@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:predict_fault
+# arn:aws:lambda:eu-central-1:123456789012:function:predict_fault
 # This function runs the predict_fault.py script on EMR Serverless and returns the job ID
 
 import boto3

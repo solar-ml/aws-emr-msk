@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:notify_failure
+# arn:aws:lambda:eu-central-1:123456789012:function:notify_failure
 # This function sends a notification to an SNS topic when the pipeline fails
 
 import boto3

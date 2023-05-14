@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:get_ingest_data_status
+# arn:aws:lambda:eu-central-1:123456789012:function:get_ingest_data_status
 # This function gets the status of the ingest_data job and returns it
 
 import boto3

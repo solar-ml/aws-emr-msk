@@ -179,7 +179,7 @@ if __name__ == "__main__":
     # Run (and wait for) a Spark job
     print("Submitting new Spark job")
     job_run_id = emr_serverless.run_spark_job(
-        script_location="s3://us-east-1.elasticmapreduce/emr-containers/samples/wordcount/scripts/wordcount.py",
+        script_location="s3://eu-central-1.elasticmapreduce/emr-containers/samples/wordcount/scripts/wordcount.py",
         job_role_arn=serverless_job_role_arn,
         arguments=[f"s3://{s3_bucket_name}/emr-serverless/output"],
         s3_bucket_name=s3_bucket_name,

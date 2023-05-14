@@ -4,7 +4,7 @@
   "States": {
     "IngestData": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ingest_data",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:ingest_data",
       "ResultPath": "$.result.ingest_job_id",
       "Next": "WaitForIngestData",
       "Retry": [
@@ -35,7 +35,7 @@
     },
     "GetIngestDataStatus": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:get_ingest_data_status",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:get_ingest_data_status",
       "InputPath": "$.result.ingest_job_id",
       "ResultPath": "$.ingest_status",
       "Next": "CheckIngestDataStatus",
@@ -78,7 +78,7 @@
     },
     "PredictFault": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:predict_fault",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:predict_fault",
       "ResultPath": "$.result.predict_job_id",
       "Next": "WaitForPredictFault",
       "Retry": [
@@ -109,7 +109,7 @@
     },
     "GetPredictFaultStatus": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:get_predict_fault_status",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:get_predict_fault_status",
       "InputPath": "$.result.predict_job_id",
       "ResultPath": "$.predict_status",
       "Next": "CheckPredictFaultStatus",
@@ -152,7 +152,7 @@
     },
     "NotifySuccess": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:notify_success",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:notify_success",
       "Parameters": {
         "ingest_job_id.$": "$.result.ingest_job_id",
         "predict_job_id.$": "$.result.predict_job_id"
@@ -184,7 +184,7 @@
     },
     "NotifyFailure": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:notify_failure",
+      "Resource": "arn:aws:lambda:eu-central-1:123456789012:function:notify_failure",
       "Retry": [
         {
           "ErrorEquals": [

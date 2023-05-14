@@ -1,4 +1,4 @@
-# arn:aws:lambda:us-east-1:123456789012:function:notify_success
+# arn:aws:lambda:eu-central-1:123456789012:function:notify_success
 # This function sends a notification to an SNS topic when the pipeline succeeds
 
 import boto3
