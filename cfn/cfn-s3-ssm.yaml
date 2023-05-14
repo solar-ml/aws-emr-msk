@@ -4,21 +4,41 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: '<default-bootstrap-bucket-name>'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   LogBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: '<default-log-bucket-name>'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   SilverBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: '<default-silver-bucket-name>'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   GoldBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: '<default-gold-bucket-name>'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   KafkaServersParam:
     Type: 'AWS::SSM::Parameter'
