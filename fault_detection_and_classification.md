@@ -1,6 +1,6 @@
 ## Fault Detection and Classification in Photovoltaic Arrays
 
-<p align="center"> <img src="i/solar_plant_desert.jpg" /> </p>
+<p align="center"> <img src="img/solar_plant_desert.jpg" /> </p>
 <!--![](img/solar_plant_desert.jpg) -->
 
 Renewable energy already accounts for a large part of the energy market. In recent decades, solar photovoltaic (PV) energy has rapidly captured a large number of markets due to its global availability, modularity, non-pollution, ease of installation, and affordability. Much progress has been made in the study of PV systems, especially in terms of efficiency, cost, and obtaining maximum available power from PV cells. Nevertheless, PV systems are often subject to a variety of types of faults, which can seriously affect the safe operation and conversion efficiency of the systems
