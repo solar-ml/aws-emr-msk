@@ -208,13 +208,13 @@ Then we download JAR files locally, then copy them to a `jars/` subdirectory wit
 
 Please consult [Algorithm: Combination of signal processing and convolutional neural network](algorithm.md) and [Wavelet Transformation introduction](<wavelet_transform_intro.md>) if you interested in more information regarding method presented below.
 
-1. The first script `ingest_data.py` consumes the batch data from the Kafka topic for 24 hours of the previous day using PySpark. We use the `startingTimestamp` and `endingTimestamp` Spark Kafka consumer parameters to filter out messages based on requirement we have.
+1. The first script [`ingest_data.py`](<src/spark/ingest_data.py>) consumes the batch data from the Kafka topic for 24 hours of the previous day using PySpark. We use the `startingTimestamp` and `endingTimestamp` Spark Kafka consumer parameters to filter out messages based on requirement we have.
 
 2. Next, Continuous Wavelet Transform signal processing applied to each of the 4 time series on a per-device basis using the Morlet mother wavelet with a scale of 64. Resulting 2D scalograms are stacked like channels of a color image, making them suitable for feeding into a CNN with LeNet-5 architecture for 64x64 pixel images.
 
 3. It then stores the processed data in a parquet file in the `silver` staging bucket. The Kafka bootstrap server and port, and the location of the silver bucket are obtained from the arguments provided by calling the lambda function. 
 
-4. The second script `predict_fault.py` reads data from the `silver` bucket and transforms it into the form required by the neural network.
+4. The second script [`predict_fault.py`](<src/spark/predict_fault.py>) reads data from the `silver` bucket and transforms it into the form required by the neural network.
 
 5. Uses the pre-trained LeNet-5 CNN model file from the `bootstrap` bucket to predict whether a given panel is under certain fault conditions, such as Line-Line, Line-Ground, Open Circuit, Partial Shading, Arc Fault or none.
 
