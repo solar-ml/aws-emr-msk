@@ -216,7 +216,7 @@ Please consult [Algorithm: Combination of signal processing and convolutional ne
 
 4. The second script [`predict_fault.py`](<src/spark/predict_fault.py>) reads data from the `silver` bucket and transforms it into the form required by the neural network.
 
-5. Uses the pre-trained LeNet-5 CNN model file from the `bootstrap` bucket to predict whether a given panel is under certain fault conditions, such as Line-Line, Line-Ground, Open Circuit, Partial Shading, Arc Fault or none.
+5. Uses the pre-trained [LeNet-5 CNN model](<src/spark/lenet_cnn.py>) file from the `bootstrap` bucket to predict whether a given panel is under certain fault conditions, such as Line-Line, Line-Ground, Open Circuit, Partial Shading, Arc Fault or none.
 
 6. Stores the data in the `gold` bucket along with the predictions. The locations of the `bootstrap`, `silver` and `gold` buckets are passed by calling the lambda function.
 
